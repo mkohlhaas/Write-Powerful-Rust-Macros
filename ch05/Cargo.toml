@@ -1,0 +1,11 @@
+[workspace]
+resolver = "2"
+
+members = [
+    "ch05-information-hiding",
+    "ch05-private-fields-exercise",
+    "ch05-hello-world-only-name-exercise",
+    "ch05-compose",
+    "ch05-compose-with-different-token-exercise",
+]
+

@@ -7,7 +7,7 @@ use config_macro::config_struct;
 struct ConfigStruct {}
 
 fn main() {
-    let config = ConfigStruct::new();
-    let map: HashMap<String, String> = config.into();
-    println!("{map:?}");
+  let config = ConfigStruct::new();
+  let map: HashMap<String, String> = config.into();
+  println!("{map:?}");
 }

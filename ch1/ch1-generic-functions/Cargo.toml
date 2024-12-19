@@ -1,6 +1,0 @@
-[package]
-name = "ch1-generic-functions"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]

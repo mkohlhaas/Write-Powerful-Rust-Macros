@@ -1,0 +1,13 @@
+[workspace]
+resolver = "2"
+members = [
+    "ch02-my-vec",
+    "ch02-my-vec-trailing-comma-exercise-solution",
+    "ch02-greeting",
+    "ch02-trace-macros",
+    "ch02-newtypes",
+    "ch02-newtypes-exercise-solutions",
+    "ch02-dsl",
+    "ch02-dsl-exercise-solution",
+    "ch02-compose",
+]

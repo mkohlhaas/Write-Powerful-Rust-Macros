@@ -1,0 +1,12 @@
+[workspace]
+resolver = "2"
+
+members = [
+    "ch03-implemented",
+    "ch03-implemented-no-syn-or-quote",
+    "ch03-initial-code",
+    "ch03-name-to-output-exercise-solution",
+    "ch03-testing-function-exercise-solution",
+    "ch03-venial",
+    "ch03-fill-in-blanks-exercise-solution",
+]

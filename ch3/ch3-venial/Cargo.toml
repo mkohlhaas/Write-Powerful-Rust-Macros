@@ -1,7 +1,0 @@
-[package]
-name = "ch3-venial"
-version = "0.1.0"
-edition = "2021"
-
-[dependencies]
-venial-macro = { path  = "./ch3-venial-macro"}

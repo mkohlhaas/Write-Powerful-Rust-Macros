@@ -1,0 +1,10 @@
+[workspace]
+resolver = "2"
+
+members = [
+    "ch04-public-macro",
+    "ch04-public-macro-with-structfield",
+    "ch04-public-macro-with-structfield-and-parse-impl",
+    "ch04-structfield-without-punctuated-exercise",
+    "ch04-enum-and-unnamed-struct-exercise",
+]
