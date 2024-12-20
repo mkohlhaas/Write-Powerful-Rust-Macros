@@ -17,7 +17,7 @@ command = ["cargo", "check", "--all-targets"]
 need_stdout = false
 
 [jobs.macro-dev]
-command = ["cargo", "expand", "macro_dev", "--color", "always"]
+command = ["cargo", "expand", "--color", "always"]
 need_stdout = true
 
 # Run clippy on the default target

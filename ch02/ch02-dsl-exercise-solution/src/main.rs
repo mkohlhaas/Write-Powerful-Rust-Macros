@@ -47,7 +47,13 @@ macro_rules! exchange {
   }; // others are similar to the above
 }
 
-fn main() {}
+fn main() {
+  let mut the_poor = Account { money: 0 };
+
+  exchange!(Give 10 "euros" to the_poor);
+  // exchange!(Give 10 "dollars" to the_poor);
+  // exchange!(Give 1 "euro" to the_poor);
+}
 
 #[cfg(test)]
 mod tests {

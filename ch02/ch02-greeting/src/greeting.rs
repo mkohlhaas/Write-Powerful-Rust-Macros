@@ -1,13 +1,13 @@
-pub fn base_greeting_fn(name: &str, greeting: &str) -> String {
-  format!("{}, {}!", greeting, name)
+pub fn base_greeting_fn(greeting: &str, name: &str) -> String {
+  format!("{} {}!", greeting, name)
 }
 
 macro_rules! greeting {
   ($name:literal) => {
-    base_greeting_fn($name, "Hello")
+    base_greeting_fn("Hello", $name)
   };
-  ($name:literal,$greeting:literal) => {
-    base_greeting_fn($name, $greeting)
+  ($greeting:literal, $name:literal) => {
+    base_greeting_fn($greeting, $name)
   };
 }
 

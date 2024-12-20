@@ -1,5 +1,3 @@
-use std::ops::{Add, Sub};
-
 #[derive(Debug)]
 struct Account {
   money: u32,
@@ -7,11 +5,11 @@ struct Account {
 
 impl Account {
   fn add(&mut self, money: u32) {
-    self.money = self.money.add(money)
+    self.money += money
   }
 
   fn subtract(&mut self, money: u32) {
-    self.money = self.money.sub(money)
+    self.money -= money
   }
 }
 
@@ -29,11 +27,11 @@ macro_rules! exchange {
 }
 
 macro_rules! give_money_to_the_poor {
-  (Give $example:literal) => {
-    println!("How generous");
-  };
   (Give 0) => {
     println!("Cheapskate");
+  };
+  (Give $example:literal) => {
+    println!("How generous");
   };
 }
 
