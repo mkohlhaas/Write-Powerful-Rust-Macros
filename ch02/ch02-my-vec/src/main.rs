@@ -1,4 +1,4 @@
-#![allow(clippy::vec_init_then_push)]
+#![allow(dead_code, unused, clippy::vec_init_then_push)]
 
 macro_rules! my_vec {
     () => {
@@ -67,5 +67,14 @@ mod tests {
     assert_eq!(actual[0], 1);
     assert_eq!(actual[1], 2);
     assert_eq!(actual[2], 3);
+  }
+}
+
+mod macro_dev {
+  fn tst() {
+    let actual = my_vec!(1, 2, 3);
+    let actual = my_vec!(1, 2, 3, 4, 5, 6);
+    let actual: Vec<i32> = my_vec!();
+    let actual: Vec<i32> = my_vec!(make an empty vec);
   }
 }
