@@ -32,15 +32,13 @@ fn main() {
   // empty vec
   let empty: Vec<i32> = my_vec![];
   println!("{:?}", empty);
-
   // empty vec
   let another_empty: Vec<i32> = my_vec![make an empty vec];
   println!("{:?}", another_empty);
-
   // non-empty vec
   let t = my_vec!(1, 2, 3);
   println!("{:?}", t);
-
+  // non-empty vec again
   let t = my_vec!(1, 2, 3,);
   println!("{:?}", t);
 }

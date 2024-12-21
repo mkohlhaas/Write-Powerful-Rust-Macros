@@ -10,5 +10,5 @@ members = [
     "ch02-dsl",
     "ch02-dsl-exercise-solution",
     "ch02-compose",
-    "ch02-exercise-1",
+    "ch02-exercise-1", "ch02-exercise-2", "ch02-exercise-3", "ch02-exercise-4",
 ]
