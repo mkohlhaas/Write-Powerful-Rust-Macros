@@ -1,0 +1,7 @@
+[package]
+name = "hello-world-exercise"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+hello-world-exercise-macro = { path = "./ch03-exercise-macro" }

@@ -1,5 +1,5 @@
 [package]
-name = "hello-world-implemented-macro"
+name = "hello-world-exercise-macro"
 version = "0.1.0"
 edition = "2021"
 

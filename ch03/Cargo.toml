@@ -9,4 +9,5 @@ members = [
     "ch03-testing-function-exercise-solution",
     "ch03-venial",
     "ch03-fill-in-blanks-exercise-solution",
+    "ch03-exercise",
 ]

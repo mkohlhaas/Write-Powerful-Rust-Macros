@@ -6,6 +6,8 @@ edition = "2021"
 [dependencies]
 venial = "0.5.0"
 quote = "1.0.33"
+proc-macro2 = "1.0.92"
 
 [lib]
 proc-macro = true
+

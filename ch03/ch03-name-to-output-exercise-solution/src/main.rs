@@ -5,6 +5,6 @@ extern crate hello_world_name_to_output_macro;
 struct Example;
 
 fn main() {
-  let e = Example {};
+  let e = Example;
   e.hello_world();
 }

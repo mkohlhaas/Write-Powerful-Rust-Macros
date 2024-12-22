@@ -5,4 +5,3 @@ edition = "2021"
 
 [dependencies]
 venial-macro = { path = "./ch03-venial-macro" }
-
