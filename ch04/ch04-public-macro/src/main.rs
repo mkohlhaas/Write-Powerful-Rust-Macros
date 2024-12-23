@@ -8,7 +8,7 @@ struct Example {
 
 fn main() {
   let _e = Example {
-    first: "first".to_string(),
+    first: "first".into(),
     second: 5,
   };
 }

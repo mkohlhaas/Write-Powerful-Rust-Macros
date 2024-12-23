@@ -2,7 +2,8 @@
 
 ## Overview
 
-This is the combined solution to several exercises from chapter 4, where we ask you to:
+This is the combined solution to several exercises from chapter 4, where we ask
+you to:
 
 - Handle unnamed fields
 - Handle enums

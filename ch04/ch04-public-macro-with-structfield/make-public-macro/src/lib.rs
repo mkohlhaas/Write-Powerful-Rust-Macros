@@ -6,14 +6,19 @@ use syn::Fields::Named;
 use syn::{parse_macro_input, DataStruct, DeriveInput, Field, FieldsNamed, Ident, Type};
 
 struct StructField {
-  name: Ident,
+  // name: Ident,
+  // Option's ToTokens trait implementation directs to ToTokens
+  // implementation of Ident
+  name: Option<Ident>,
   ty: Type,
 }
 
 impl StructField {
   fn new(field: &Field) -> Self {
     Self {
-      name: field.ident.as_ref().unwrap().clone(),
+      // Funny business not necessary.
+      // name: field.ident.as_ref().unwrap().clone(),
+      name: field.ident.clone(),
       ty: field.ty.clone(),
     }
   }
@@ -40,13 +45,14 @@ pub fn public(_attr: TokenStream, item: TokenStream) -> TokenStream {
     _ => unimplemented!("only works for structs with named fields"),
   };
 
+  // builder_fields: Map<Iter<'_, Field>, fn new(&Field) -> StructField>
+  // point-free mapping (instead of map(|f| StructField::new(f)))
   let builder_fields = fields.iter().map(StructField::new);
 
-  let public_version = quote! {
+  quote! {
       pub struct #name {
           #(#builder_fields,)*
       }
-  };
-
-  public_version.into()
+  }
+  .into()
 }

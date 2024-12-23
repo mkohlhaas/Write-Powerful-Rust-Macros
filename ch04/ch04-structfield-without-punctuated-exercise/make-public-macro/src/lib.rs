@@ -2,11 +2,11 @@ use proc_macro::TokenStream;
 use quote::{quote, ToTokens};
 use syn::parse::{Parse, ParseStream};
 use syn::token::Colon;
-use syn::Data::Struct;
-use syn::DataStruct;
-use syn::Fields::Named;
-use syn::FieldsNamed;
 use syn::{parse_macro_input, DeriveInput, Ident, Type, Visibility};
+use syn::{Data::Struct, DataStruct};
+use syn::{Fields::Named, FieldsNamed};
+
+type TokenStream2 = proc_macro2::TokenStream;
 
 struct StructField {
   name: Ident,
@@ -14,7 +14,7 @@ struct StructField {
 }
 
 impl ToTokens for StructField {
-  fn to_tokens(&self, tokens: &mut proc_macro2::TokenStream) {
+  fn to_tokens(&self, tokens: &mut TokenStream2) {
     let n = &self.name;
     let t = &self.ty;
     quote!(pub #n: #t).to_tokens(tokens)
@@ -22,7 +22,7 @@ impl ToTokens for StructField {
 }
 
 impl Parse for StructField {
-  fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+  fn parse(input: ParseStream) -> syn::Result<Self> {
     let _vis: Result<Visibility, _> = input.parse();
     let name: Ident = input.parse().unwrap();
     let _colon: Result<Colon, _> = input.parse();
@@ -45,6 +45,8 @@ pub fn public(_attr: TokenStream, item: TokenStream) -> TokenStream {
     _ => unimplemented!("only works for structs with named fields"),
   };
 
+  // builder_fields: Map<syn::Iter<syn::Field>, fn(&Field) -> StructField>
+  // Basically a Map of StructField.
   let builder_fields = fields
     .iter()
     .map(|f| syn::parse2::<StructField>(f.to_token_stream()).unwrap());
