@@ -21,27 +21,21 @@ mod tests {
   #[test]
   fn basic_test() {
     let compose = compose!(add_one.add_one.stringify);
-
     let actual = compose(5);
-
     assert_eq!(actual, "7");
   }
 
   #[test]
   fn two_elements_test() {
     let compose = compose!(add_one.stringify);
-
     let actual = compose(5);
-
     assert_eq!(actual, "6");
   }
 
   #[test]
   fn four_elements_test() {
     let compose = compose!(add_one.add_one.add_one.add_one);
-
     let actual = compose(12);
-
     assert_eq!(actual, 16);
   }
 }

@@ -4,4 +4,4 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
-function-like-compose-macro = { path = "ch05-function-like-compose-macro" }
+function-like-compose-macro = { path = "./ch05-function-like-compose-macro" }
