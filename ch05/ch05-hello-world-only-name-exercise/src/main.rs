@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use hello_world_only_name_exercise_macro::hello;
 
 struct Example {

@@ -3,18 +3,18 @@ use proc_macro::TokenStream;
 use proc_macro2::Ident;
 use quote::{quote, ToTokens};
 use syn::parse::{Parse, ParseStream};
+use syn::parse_macro_input;
 use syn::punctuated::Punctuated;
-use syn::token::Not;
-use syn::{parse_macro_input, Token};
+use syn::token::FatArrow;
 
 struct ComposeInput {
-  expressions: Punctuated<Ident, Not>,
+  expressions: Punctuated<Ident, FatArrow>,
 }
 
 impl Parse for ComposeInput {
   fn parse(input: ParseStream) -> Result<Self, syn::Error> {
     Ok(ComposeInput {
-      expressions: Punctuated::<Ident, Token!(!)>::parse_terminated(input).unwrap(),
+      expressions: Punctuated::<Ident, FatArrow>::parse_terminated(input).unwrap(),
     })
   }
 }
@@ -25,14 +25,15 @@ impl ToTokens for ComposeInput {
     let mut as_idents: Vec<&Ident> = self.expressions.iter().collect();
     let last_ident = as_idents.pop().unwrap();
 
-    as_idents.iter().rev().for_each(|i| {
-      if let Some(current_total) = &total {
-        total = Some(quote!(
-            compose_two(#i, #current_total)
-        ));
-      } else {
+    as_idents.iter().rev().for_each(|i| match &total {
+      None => {
         total = Some(quote!(
             compose_two(#i, #last_ident)
+        ));
+      }
+      Some(current_total) => {
+        total = Some(quote!(
+            compose_two(#i, #current_total)
         ));
       }
     });

@@ -9,7 +9,7 @@ fn stringify(n: i32) -> String {
 }
 
 fn main() {
-  let compose = compose!(add_one ! add_one ! stringify);
+  let compose = compose!(add_one => add_one => stringify);
   println!("{:?}", compose(5));
 }
 
@@ -19,7 +19,7 @@ mod tests {
 
   #[test]
   fn basic_test() {
-    let compose = compose!(add_one ! add_one ! stringify);
+    let compose = compose!(add_one => add_one => stringify);
 
     let actual = compose(5);
 

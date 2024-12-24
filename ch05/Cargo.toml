@@ -7,5 +7,6 @@ members = [
     "ch05-hello-world-only-name-exercise",
     "ch05-compose",
     "ch05-compose-with-different-token-exercise",
+    "ch05-car-theft",
+    "ch05-car-gps-theft",
 ]
-

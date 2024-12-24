@@ -11,7 +11,13 @@ fn stringify(n: i32) -> String {
 fn main() {
   let compose = compose!(add_one.add_one.stringify);
   println!("{:?}", compose(5));
+
+  // won't work:
+  // let compose = compose!(add_one);
+  // println!("{:?}", compose(5));
 }
+
+// Tests ///////////////////////////////////////////////////////
 
 #[cfg(test)]
 mod tests {

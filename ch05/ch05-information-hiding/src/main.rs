@@ -13,8 +13,10 @@ fn main() {
     number_value: 2,
   };
 
-  e.get_string_value();
-  e.get_number_value();
+  let sv: &String = e.get_string_value();
+  let nv: &i32 = e.get_number_value();
+  println!("String value: {:?}", sv);
+  println!("Number value: {:?}", nv);
 }
 
 #[cfg(test)]

@@ -15,7 +15,7 @@ fn get_field_info(ast: &DeriveInput) -> Vec<(&Ident, &Type)> {
   }
   .iter()
   .map(|f| {
-    let field_name = f.ident.as_ref().take().unwrap();
+    let field_name = f.ident.as_ref().unwrap();
     let type_name = &f.ty;
 
     (field_name, type_name)
@@ -42,9 +42,7 @@ fn generated_methods(fields: &Vec<(&Ident, &Type)>) -> Vec<TokenStream2> {
 fn generate_private_fields(fields: &Vec<(&Ident, &Type)>) -> Vec<TokenStream2> {
   fields
     .iter()
-    .map(|f| {
-      let (field_name, type_name) = f;
-
+    .map(|(field_name, type_name)| {
       quote!(
           #field_name: #type_name
       )
@@ -56,7 +54,7 @@ fn generate_private_fields(fields: &Vec<(&Ident, &Type)>) -> Vec<TokenStream2> {
 pub fn private(item: TokenStream) -> TokenStream {
   let ast = parse_macro_input!(item as DeriveInput);
   let name = &ast.ident;
-  let fields = get_field_info(&ast);
+  let fields: Vec<(&Ident, &Type)> = get_field_info(&ast);
   let output_fields = generate_private_fields(&fields);
   let methods = generated_methods(&fields);
 
@@ -65,9 +63,11 @@ pub fn private(item: TokenStream) -> TokenStream {
           #(#output_fields,)*
       }
 
+      // NOTE: This is hardcoded!!!
       impl #name {
+          // NOTE: We would need params here. How to handle '&str' as input?
           pub fn new() -> Self {
-              Example {
+              #name {
                   string_value: "value".to_string(),
                   number_value: 2,
               }
