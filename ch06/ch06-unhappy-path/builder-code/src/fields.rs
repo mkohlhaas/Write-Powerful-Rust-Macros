@@ -18,38 +18,6 @@ pub fn original_struct_setters(
   })
 }
 
-// pub fn original_struct_setters(fields: &Punctuated<Field, Comma>) -> impl Iterator<Item = TokenStream2> + '_ {
-//     fields.iter().map(|f| {
-//         let (field_name, field_type) = get_name_and_type(&f);
-//         let field_name_as_string = field_name.as_ref().unwrap().to_string();
-//         let error = quote!(expect(&format!("Field {} not set", #field_name_as_string)));
-//
-//         let handle_type = if matches_type(field_type, "String") {
-//             quote! {
-//                     as_ref()
-//                     .#error
-//                     .to_string()
-//             }
-//         } else {
-//             quote! {
-//                 #error
-//             }
-//         };
-//
-//         quote! {
-//             #field_name: self.#field_name.#handle_type
-//         }
-//     })
-// }
-
-// fn matches_type(ty: &Type, type_name: &str) -> bool {
-//     if let Type::Path(ref p) = ty {
-//         let first_match = p.path.segments[0].ident.to_string();
-//         return first_match == *type_name;
-//     }
-//     false
-// }
-
 pub fn builder_methods(
   fields: &Punctuated<Field, Comma>,
 ) -> impl Iterator<Item = TokenStream2> + '_ {

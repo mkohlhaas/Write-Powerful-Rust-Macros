@@ -1,4 +1,22 @@
-fn main() {}
+#![allow(dead_code, unused)]
+
+use builder_macro::Builder;
+#[derive(Builder)]
+struct ExampleStructNoFields {}
+
+#[derive(Builder)]
+struct Gleipnir {
+  roots_of: String,
+  breath_of_a_fish: u8,
+}
+
+fn main() {
+  let _fu = ExampleStructNoFields {};
+  let _gleipnir = Gleipnir::builder()
+    .roots_of("mountains".to_string())
+    .breath_of_a_fish(1)
+    .build();
+}
 
 #[cfg(test)]
 mod tests {
@@ -8,7 +26,6 @@ mod tests {
   fn should_generate_builder_for_struct_with_no_properties() {
     #[derive(Builder)]
     struct ExampleStructNoFields {}
-
     let _: ExampleStructNoFields = ExampleStructNoFields::builder().build();
   }
 

@@ -21,9 +21,7 @@ mod tests {
     let input = quote! {
         struct StructWithNoFields {}
     };
-
     let actual = create_builder(input);
-
     assert!(actual.to_string().contains("StructWithNoFieldsBuilder"));
   }
 
@@ -35,9 +33,7 @@ mod tests {
     let expected = quote! {
         struct StructWithNoFieldsBuilder {}
     };
-
     let actual = create_builder(input);
-
     assert_eq!(actual.to_string(), expected.to_string());
   }
 
@@ -46,10 +42,8 @@ mod tests {
     let input = quote! {
         struct StructWithNoFields {}
     };
-
     let actual = create_builder(input);
     let actual_derived: DeriveInput = syn::parse2(actual).unwrap();
-
     let name = actual_derived.ident;
     assert_eq!(name.to_string(), "StructWithNoFieldsBuilder");
   }

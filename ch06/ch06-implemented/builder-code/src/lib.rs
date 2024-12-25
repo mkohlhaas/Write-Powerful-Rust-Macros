@@ -1,15 +1,11 @@
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
-use syn::Data::Struct;
-use syn::DataStruct;
-use syn::DeriveInput;
-use syn::Fields::Named;
-use syn::FieldsNamed;
+use syn::{Data::Struct, DataStruct, DeriveInput, Fields::Named, FieldsNamed};
 
 pub fn create_builder(item: TokenStream) -> TokenStream {
   let ast: DeriveInput = syn::parse2(item).unwrap();
-  let name = ast.ident;
-  let builder = format_ident!("{}Builder", name);
+  let name_original_struct = ast.ident;
+  let builder_name = format_ident!("{}Builder", name_original_struct);
 
   let fields = match ast.data {
     Struct(DataStruct {
@@ -18,15 +14,21 @@ pub fn create_builder(item: TokenStream) -> TokenStream {
     }) => named,
     _ => unimplemented!("only implemented for structs"),
   };
+
+  // optionize struct fields
   let builder_fields = fields.iter().map(|f| {
     let field_name = &f.ident;
     let field_type = &f.ty;
     quote! { #field_name: Option<#field_type> }
   });
+
+  // initialize builder fields to None
   let builder_inits = fields.iter().map(|f| {
     let field_name = &f.ident;
     quote! { #field_name: None }
   });
+
+  // create setters for all struct fields in the builder
   let builder_methods = fields.iter().map(|f| {
     let field_name = &f.ident;
     let field_type = &f.ty;
@@ -37,11 +39,14 @@ pub fn create_builder(item: TokenStream) -> TokenStream {
         }
     }
   });
-  let original_struct_set_fields = fields.iter().map(|f| {
+
+  // copy values from builder to original struct
+  let set_fields_in_original_struct = fields.iter().map(|f| {
     let field_name = &f.ident;
     let field_name_as_string = field_name.as_ref().unwrap().to_string();
 
     quote! {
+        // copy fields
         #field_name: self.#field_name.as_ref()
             .expect(&format!("field {} not set", #field_name_as_string))
             .to_string()
@@ -49,21 +54,21 @@ pub fn create_builder(item: TokenStream) -> TokenStream {
   });
 
   quote! {
-      struct #builder {
+      struct #builder_name {
           #(#builder_fields,)*
       }
-      impl #builder {
+      impl #builder_name {
           #(#builder_methods)*
 
-          pub fn build(&self) -> #name {
-              #name {
-                  #(#original_struct_set_fields,)*
+          pub fn build(&self) -> #name_original_struct {
+              #name_original_struct {
+                  #(#set_fields_in_original_struct,)*
               }
           }
       }
-      impl #name {
-          pub fn builder() -> #builder {
-              #builder {
+      impl #name_original_struct {
+          pub fn builder() -> #builder_name {
+              #builder_name {
                   #(#builder_inits,)*
               }
           }

@@ -1,6 +1,6 @@
 mod fields;
 
-use crate::fields::{
+use fields::{
   builder_field_definitions, builder_init_values, builder_methods, original_struct_setters,
 };
 use proc_macro2::TokenStream;
