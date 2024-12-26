@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use panic_to_result_macro::panic_to_result;
 
 #[allow(dead_code)]
@@ -15,7 +17,11 @@ fn create_person(name: String, age: u32) -> Person {
   Person { name, age }
 }
 
-fn main() {}
+fn main() {
+  let _ = create_person("Maria".to_string(), 25);
+  // panics
+  let _ = create_person("John".to_string(), 45);
+}
 
 #[cfg(test)]
 mod tests {
@@ -24,7 +30,6 @@ mod tests {
   #[test]
   fn happy_path() {
     let actual = create_person("Sam".to_string(), 22).unwrap();
-
     assert_eq!(actual.name, "Sam".to_string());
     assert_eq!(actual.age, 22);
   }

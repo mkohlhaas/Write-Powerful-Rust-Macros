@@ -1,6 +1,7 @@
+#![allow(dead_code)]
+
 use panic_to_result_macro::panic_to_result;
 
-#[allow(dead_code)]
 #[derive(Debug)]
 pub struct Person {
   name: String,

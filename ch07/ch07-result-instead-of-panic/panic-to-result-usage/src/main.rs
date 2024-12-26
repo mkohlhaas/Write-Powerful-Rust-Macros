@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use panic_to_result_macro::panic_to_result;
 
 #[allow(dead_code)]

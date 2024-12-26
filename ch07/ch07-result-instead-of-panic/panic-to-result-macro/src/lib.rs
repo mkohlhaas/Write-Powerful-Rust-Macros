@@ -1,10 +1,11 @@
 use proc_macro::TokenStream;
 use quote::{quote, ToTokens};
-use syn::token::Semi;
-use syn::{Expr, ItemFn, ReturnType, Stmt, StmtMacro};
+use syn::{
+  __private::TokenStream2, parse2, token::Semi, Expr, ItemFn, ReturnType, Stmt, StmtMacro,
+};
 
-fn signature_output_as_result(ast: &ItemFn) -> ReturnType {
-  let output = match ast.sig.output {
+fn signature_output_as_result(item_fn: &ItemFn) -> ReturnType {
+  let output = match item_fn.sig.output {
     ReturnType::Default => {
       quote! {
           -> Result<(), String>
@@ -16,45 +17,48 @@ fn signature_output_as_result(ast: &ItemFn) -> ReturnType {
       }
     }
   };
-  syn::parse2(output).unwrap()
+  parse2(output).unwrap()
 }
 
 fn last_statement_as_result(last_statement: Option<Stmt>) -> Stmt {
-  let last_unwrapped = last_statement.unwrap();
-  let last_modified = quote! {
+  let last_unwrapped: Stmt = last_statement.unwrap();
+  let last_modified: TokenStream2 = quote! {
       Ok(#last_unwrapped)
   };
-  Stmt::Expr(syn::parse2(last_modified).unwrap(), None)
+  Stmt::Expr(parse2(last_modified).unwrap(), None)
 }
 
 fn handle_expression(expression: Expr, token: Option<Semi>) -> Stmt {
-  match expression {
-    Expr::If(mut ex_if) => {
-      let new_statements: Vec<Stmt> = ex_if
-        .then_branch
-        .stmts
-        .into_iter()
-        .map(|s| match s {
-          Stmt::Macro(ref expr_macro) => extract_panic_content(expr_macro)
-            .map(|t| {
+  if let Expr::If(mut ex_if) = expression {
+    let new_statements: Vec<Stmt> = ex_if
+      .then_branch
+      .stmts
+      .into_iter()
+      .map(|stmt| {
+        if let Stmt::Macro(ref expr_macro) = stmt {
+          extract_panic_content(expr_macro)
+            .map(|token_stream2| {
               quote! {
-                  return Err(#t.to_string());
+                  return Err(#token_stream2.to_string());
               }
             })
-            .map(syn::parse2)
-            .map(Result::unwrap)
-            .unwrap_or(s),
-          _ => s,
-        })
-        .collect();
-      ex_if.then_branch.stmts = new_statements;
-      Stmt::Expr(Expr::If(ex_if), token)
-    }
-    _ => Stmt::Expr(expression, token),
+            .map(parse2)
+            .map(Result::unwrap) // unwrap Result of parse2
+            .unwrap() // unwrap Option
+        } else {
+          stmt
+        }
+      })
+      .collect();
+    ex_if.then_branch.stmts = new_statements;
+    Stmt::Expr(Expr::If(ex_if), token)
+  } else {
+    Stmt::Expr(expression, token)
   }
 }
 
-fn extract_panic_content(expr_macro: &StmtMacro) -> Option<proc_macro2::TokenStream> {
+fn extract_panic_content(expr_macro: &StmtMacro) -> Option<TokenStream2> {
+  // eprintln!("{:#?}", expr_macro);
   let does_panic = expr_macro
     .mac
     .path
@@ -71,25 +75,28 @@ fn extract_panic_content(expr_macro: &StmtMacro) -> Option<proc_macro2::TokenStr
 
 #[proc_macro_attribute]
 pub fn panic_to_result(_attr: TokenStream, item: TokenStream) -> TokenStream {
-  let mut ast: ItemFn = syn::parse(item).unwrap();
+  let mut item_fn: ItemFn = syn::parse(item).unwrap();
 
-  let new_statements: Vec<Stmt> = ast
+  let new_statements: Vec<Stmt> = item_fn
     .block
     .stmts
     .into_iter()
-    .map(|s| match s {
-      Stmt::Expr(e, t) => handle_expression(e, t),
-      _ => s,
+    .map(|s| {
+      if let Stmt::Expr(e, t) = s {
+        handle_expression(e, t)
+      } else {
+        s
+      }
     })
     .collect();
-  ast.block.stmts = new_statements;
+  item_fn.block.stmts = new_statements;
 
-  ast.sig.output = signature_output_as_result(&ast);
-  let last_statement = ast.block.stmts.pop();
-  ast
+  item_fn.sig.output = signature_output_as_result(&item_fn);
+  let last_statement = item_fn.block.stmts.pop();
+  item_fn
     .block
     .stmts
     .push(last_statement_as_result(last_statement));
 
-  ast.to_token_stream().into()
+  item_fn.to_token_stream().into()
 }

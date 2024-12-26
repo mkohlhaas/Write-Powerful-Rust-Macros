@@ -1,6 +1,5 @@
 use proc_macro::TokenStream;
-use proc_macro_error::abort;
-use proc_macro_error::proc_macro_error;
+use proc_macro_error::{abort, proc_macro_error};
 use quote::quote;
 use syn::Data::Enum;
 use syn::Data::Struct;
@@ -8,8 +7,8 @@ use syn::Fields::Named;
 use syn::__private::{Span, TokenStream2};
 use syn::{parse_macro_input, DataStruct, DeriveInput, FieldsNamed, Ident, Type};
 
-fn get_field_info(ast: &DeriveInput) -> Vec<(&Ident, &Type)> {
-  match ast.data {
+fn get_field_info(derive_input: &DeriveInput) -> Vec<(&Ident, &Type)> {
+  match derive_input.data {
     Struct(DataStruct {
       fields: Named(FieldsNamed { ref named, .. }),
       ..
@@ -18,13 +17,13 @@ fn get_field_info(ast: &DeriveInput) -> Vec<(&Ident, &Type)> {
             help = "this macro can only be used on structs"
     ),
     _ => abort!(
-      ast.ident,
+      derive_input.ident,
       "only works for structs with named fields".to_string()
     ),
   }
   .iter()
   .map(|f| {
-    let field_name = f.ident.as_ref().take().unwrap();
+    let field_name = f.ident.as_ref().unwrap();
     let type_name = &f.ty;
 
     (field_name, type_name)

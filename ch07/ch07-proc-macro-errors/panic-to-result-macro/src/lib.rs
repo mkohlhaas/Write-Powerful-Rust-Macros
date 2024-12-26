@@ -1,7 +1,6 @@
 use proc_macro::TokenStream;
 
-use proc_macro_error::emit_error;
-use proc_macro_error::proc_macro_error;
+use proc_macro_error::{emit_error, proc_macro_error};
 use quote::{quote, ToTokens};
 use syn::token::Semi;
 use syn::{Expr, ItemFn, ReturnType, Stmt, StmtMacro};

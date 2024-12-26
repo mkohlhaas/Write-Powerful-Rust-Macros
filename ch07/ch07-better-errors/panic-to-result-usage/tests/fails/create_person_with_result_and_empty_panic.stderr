@@ -1,8 +1,8 @@
 error: please make sure every panic in your function has a message
-  --> tests/fails/create_person_with_result_and_empty_panic.rs:12:9
+  --> tests/fails/create_person_with_result_and_empty_panic.rs:12:5
    |
-12 |         panic!();
-   |         ^^^^^
+12 |     panic!();
+   |     ^^^^^
 
 error: this macro can only be applied to a function that does not return a Result. Signature: Result < Person, String >
   --> tests/fails/create_person_with_result_and_empty_panic.rs:10:1

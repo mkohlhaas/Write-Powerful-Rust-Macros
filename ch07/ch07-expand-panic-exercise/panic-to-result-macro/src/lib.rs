@@ -1,7 +1,6 @@
 use proc_macro::TokenStream;
 
-use proc_macro_error::emit_error;
-use proc_macro_error::proc_macro_error;
+use proc_macro_error::{emit_error, proc_macro_error};
 use quote::{quote, ToTokens};
 use syn::token::Semi;
 use syn::{Expr, ItemFn, ReturnType, Stmt, StmtMacro};
@@ -83,7 +82,6 @@ fn handle_expression(expression: Expr, token: Option<Semi>) -> Stmt {
         .map(|s| match s {
           Stmt::Macro(ref expr_macro) => {
             let output = extract_panic_content(expr_macro);
-
             if output.map(|v| v.is_empty()).unwrap_or(false) {
               emit_error!(expr_macro, "panic needs a message!".to_string();
                       help = "try to add a message: panic!(\"Example\".to_string())";

@@ -7,9 +7,14 @@ private!(
   }
 );
 
-// will fail
+// rust-analyzer: only works for structs with named fields [macro-error]
 // private!(
-//     enum Example {
-//         First
-//     }
+//   struct Example1(String, i32);
+// );
+
+// rustc: does not work for enums
+// private!(
+//   enum Example {
+//     First,
+//   }
 // );

@@ -1,10 +1,9 @@
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::Data::Enum;
-use syn::Data::Struct;
-use syn::Fields::Named;
 use syn::__private::{Span, ToTokens, TokenStream2};
 use syn::spanned::Spanned;
+use syn::Data::{Enum, Struct};
+use syn::Fields::Named;
 use syn::{parse_macro_input, DataStruct, DeriveInput, FieldsNamed, Ident, Type};
 
 fn get_field_info(ast: &DeriveInput) -> Result<Vec<(&Ident, &Type)>, syn::Error> {
@@ -29,7 +28,7 @@ fn get_field_info(ast: &DeriveInput) -> Result<Vec<(&Ident, &Type)>, syn::Error>
     }
     .iter()
     .map(|f| {
-      let field_name = f.ident.as_ref().take().unwrap();
+      let field_name = f.ident.as_ref().unwrap();
       let type_name = &f.ty;
 
       (field_name, type_name)
