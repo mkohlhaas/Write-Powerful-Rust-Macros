@@ -54,6 +54,7 @@ pub fn original_struct_setters(
       let (field_name, field_type) = get_name_and_type(f);
       let field_name_as_string = field_name.as_ref().unwrap().to_string();
 
+      // NOTE: Uppercasing for string fields
       let uppercase_attribute = extract_attribute_from_field(f, "uppercase");
 
       let to_add = if uppercase_attribute.is_some() && matches_type(field_type, "String") {

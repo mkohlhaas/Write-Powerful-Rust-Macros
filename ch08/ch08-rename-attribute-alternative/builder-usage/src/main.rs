@@ -11,9 +11,7 @@ mod tests {
       #[rename = "tops_of"]
       roots_of: String,
     }
-
     let gleipnir = Gleipnir::builder().tops_of("mountains".to_string()).build();
-
     assert_eq!(gleipnir.roots_of, "mountains".to_string());
   }
 }

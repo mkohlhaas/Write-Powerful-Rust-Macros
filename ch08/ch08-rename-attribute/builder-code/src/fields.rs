@@ -1,52 +1,38 @@
-use proc_macro2::TokenStream;
 use quote::quote;
-use syn::__private::TokenStream2;
-use syn::punctuated::Punctuated;
-use syn::token::Comma;
-use syn::{Field, Ident, LitStr, Meta, Type};
+use syn::{__private::TokenStream2, punctuated::Punctuated};
+use syn::{token::Comma, Field, Ident, LitStr, Meta};
 
-pub fn builder_methods(fields: &Punctuated<Field, Comma>) -> Vec<TokenStream> {
+type Fields = Punctuated<Field, Comma>;
+
+pub fn builder_methods(fields: &Fields) -> Vec<TokenStream2> {
   fields
     .iter()
-    .map(|f| {
-      let (field_name, field_type) = get_name_and_type(f);
-      let attr = extract_attribute_from_field(f, "rename")
-        // alternative if you decide to forgo quotation marks in the list
-        // .map(|a| {
-        //     let mut content = None;
-        //
-        //     a.parse_nested_meta(|m| {
-        //         let i = &m.path.segments.first().unwrap().ident;
-        //         content = Some(Ident::new(&i.to_string(), i.span()));
-        //         Ok(())
-        //     }).unwrap();
-        //
-        //     content.unwrap()
-        // })
-        .map(|a| &a.meta)
-        .map(|m| {
-          match m {
-            Meta::List(nested) => {
-              // &nested.tokens // if you decide to forgo quotation marks in the list
-              let a: LitStr = nested.parse_args().unwrap();
-              Ident::new(&a.value(), a.span())
-            }
-            Meta::Path(_) => panic!("expected rename to have brackets with name of property"),
-            Meta::NameValue(_) => panic!("did not expect rename to have names and values"),
+    .map(|f @ Field { ident, ty, .. }| {
+      let renamed_fn: Option<Ident> = f
+        .attrs
+        .iter()
+        .find(|&attr| attr.path().is_ident("rename")) // NOTE: "rename" attribute is here
+        .map(|attr| &attr.meta)
+        .map(|meta| match meta {
+          Meta::List(nested) => {
+            let a: LitStr = nested.parse_args().unwrap();
+            Ident::new(&a.value(), a.span())
           }
+          Meta::Path(_) => panic!("expected rename to have brackets with name of property"),
+          Meta::NameValue(_) => panic!("did not expect rename to have names and values"),
         });
 
-      if let Some(attr) = attr {
+      if let Some(renamed_fn) = renamed_fn {
         quote! {
-            pub fn #attr(mut self, input: #field_type) -> Self {
-                self.#field_name = Some(input);
+            pub fn #renamed_fn(mut self, input: #ty) -> Self {
+                self.#ident = Some(input);
                 self
             }
         }
       } else {
         quote! {
-            pub fn #field_name(mut self, input: #field_type) -> Self {
-                self.#field_name = Some(input);
+            pub fn #ident(mut self, input: #ty) -> Self {
+                self.#ident = Some(input);
                 self
             }
         }
@@ -55,44 +41,23 @@ pub fn builder_methods(fields: &Punctuated<Field, Comma>) -> Vec<TokenStream> {
     .collect()
 }
 
-pub fn original_struct_setters(
-  fields: &Punctuated<Field, Comma>,
-) -> impl Iterator<Item = TokenStream2> + '_ {
-  fields.iter().map(|f| {
-    let field_name = &f.ident;
-    let field_name_as_string = field_name.as_ref().unwrap().to_string();
-
+pub fn original_struct_setters(fields: &Fields) -> impl Iterator<Item = TokenStream2> + '_ {
+  fields.iter().map(|Field { ident, .. }| {
     quote! {
-        #field_name: self.#field_name
-            .expect(concat!("field not set: ", #field_name_as_string))
+        #ident: self.#ident
+            .expect(concat!("field not set: ", stringify!(#ident)))
     }
   })
 }
 
-pub fn builder_init_values(
-  fields: &Punctuated<Field, Comma>,
-) -> impl Iterator<Item = TokenStream2> + '_ {
-  fields.iter().map(|f| {
-    let field_name = &f.ident;
-    quote! { #field_name: None }
+pub fn builder_init_values(fields: &Fields) -> impl Iterator<Item = TokenStream2> + '_ {
+  fields.iter().map(|Field { ident, .. }| {
+    quote! { #ident: None }
   })
 }
 
-pub fn builder_field_definitions(
-  fields: &Punctuated<Field, Comma>,
-) -> impl Iterator<Item = TokenStream2> + '_ {
-  fields.iter().map(|f| {
-    let (field_name, field_type) = get_name_and_type(f);
-    quote! { #field_name: Option<#field_type> }
+pub fn builder_field_definitions(fields: &Fields) -> impl Iterator<Item = TokenStream2> + '_ {
+  fields.iter().map(|Field { ident, ty, .. }| {
+    quote! { #ident: Option<#ty> }
   })
-}
-
-fn get_name_and_type<'a>(f: &'a Field) -> (&'a Option<Ident>, &'a Type) {
-  let field_name = &f.ident;
-  let field_type = &f.ty;
-  (field_name, field_type)
-}
-
-fn extract_attribute_from_field<'a>(f: &'a Field, name: &'a str) -> Option<&'a syn::Attribute> {
-  f.attrs.iter().find(|&attr| attr.path().is_ident(name))
 }

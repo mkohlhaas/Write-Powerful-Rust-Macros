@@ -2,9 +2,8 @@ use proc_macro::TokenStream;
 
 use quote::quote;
 use syn::parse::{Parse, ParseStream};
-use syn::parse_macro_input;
-use syn::token::Colon;
-use syn::{braced, Attribute, Ident, Token, Type};
+use syn::{braced, parse_macro_input};
+use syn::{token::Colon, Attribute, Ident, Token, Type};
 
 #[allow(dead_code)]
 #[derive(Debug)]
@@ -41,6 +40,7 @@ impl Parse for StructWithComments {
 
 #[proc_macro]
 pub fn analyze(item: TokenStream) -> TokenStream {
-  let _: StructWithComments = parse_macro_input!(item);
+  let struct_with_comments: StructWithComments = parse_macro_input!(item);
+  eprintln!("{:#?}", struct_with_comments);
   quote!().into()
 }

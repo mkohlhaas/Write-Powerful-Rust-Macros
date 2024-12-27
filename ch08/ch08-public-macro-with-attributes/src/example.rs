@@ -1,3 +1,5 @@
+#![allow(unused)]
+
 use make_public_macro::public;
 
 #[public(exclude(fourth, third))]

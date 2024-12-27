@@ -1,3 +1,5 @@
+#![allow(non_camel_case_types)]
+
 fn main() {}
 
 #[cfg(test)]

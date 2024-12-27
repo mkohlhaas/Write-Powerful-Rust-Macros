@@ -1,4 +1,21 @@
-fn main() {}
+#![allow(non_camel_case_types, dead_code)]
+
+use builder_macro::Builder;
+
+#[derive(Builder)]
+struct Gleipnir {
+  roots_of: String,
+  breath_of_a_fish: u8,
+  anything_else: bool,
+}
+
+fn main() {
+  let _gleipnir = Gleipnir::builder()
+    .roots_of("mountains".to_string())
+    .breath_of_a_fish(1)
+    .anything_else(true)
+    .build();
+}
 
 #[cfg(test)]
 mod tests {

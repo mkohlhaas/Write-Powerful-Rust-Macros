@@ -1,27 +1,30 @@
-use proc_macro2::TokenStream;
-use quote::quote;
-use syn::punctuated::Punctuated;
-use syn::token::Comma;
-use syn::{Field, Ident, Type};
-
 use crate::util::{create_builder_ident, create_field_struct_name};
+use quote::quote;
+use syn::{Field, Ident, Type, __private::TokenStream2};
 
-pub fn builder_methods(struct_name: &Ident, fields: &Punctuated<Field, Comma>) -> TokenStream {
+type PFields = syn::punctuated::Punctuated<Field, syn::token::Comma>;
+
+pub fn builder_methods(struct_name: &Ident, fields: &PFields) -> TokenStream2 {
   let builder_name = create_builder_ident(struct_name);
   let set_fields = original_struct_setters(fields);
   let assignments_for_all_fields = get_assignments_for_fields(fields);
   let mut previous_field = None;
 
   let reversed_names_and_types: Vec<&Field> = fields.iter().rev().collect();
-  let methods: Vec<TokenStream> = reversed_names_and_types
+  let methods: Vec<TokenStream2> = reversed_names_and_types
     .iter()
-    .map(|f| {
+    .map(|field| {
       if let Some(next_in_list) = previous_field {
-        previous_field = Some(f);
-        builder_for_field(&builder_name, &assignments_for_all_fields, f, next_in_list)
+        previous_field = Some(field);
+        builder_for_field(
+          &builder_name,
+          &assignments_for_all_fields,
+          field,
+          next_in_list,
+        )
       } else {
-        previous_field = Some(f);
-        builder_for_final_field(&builder_name, &assignments_for_all_fields, f)
+        previous_field = Some(field);
+        builder_for_final_field(&builder_name, &assignments_for_all_fields, field)
       }
     })
     .collect();
@@ -39,40 +42,27 @@ pub fn builder_methods(struct_name: &Ident, fields: &Punctuated<Field, Comma>) -
   }
 }
 
-fn builder_for_field(
-  builder_name: &Ident,
-  field_assignments: &Vec<TokenStream>,
-  current_field: &Field,
-  next_field_in_list: &Field,
-) -> TokenStream {
-  let (field_name, field_type) = get_name_and_type(current_field);
+fn original_struct_setters(fields: &PFields) -> Vec<TokenStream2> {
+  fields
+    .iter()
+    .map(|Field { ident, .. }| {
+      let field_name = ident.as_ref().unwrap().to_string();
+      let handle_type = panic_fallback(field_name);
 
-  let (next_field_name, _) = get_name_and_type(next_field_in_list);
-  let current_field_struct_name =
-    create_field_struct_name(&builder_name, field_name.as_ref().unwrap());
-  let next_field_struct_name =
-    create_field_struct_name(&builder_name, next_field_name.as_ref().unwrap());
-
-  quote! {
-      impl #builder_name<#current_field_struct_name> {
-          pub fn #field_name(mut self, input: #field_type) -> #builder_name<#next_field_struct_name> {
-              self.#field_name = Some(input);
-              #builder_name {
-                  marker: Default::default(),
-                  #(#field_assignments,)*
-              }
-          }
+      quote! {
+          #ident: self.#ident.#handle_type
       }
-  }
+    })
+    .collect()
 }
 
 fn builder_for_final_field(
   builder_name: &Ident,
-  field_assignments: &Vec<TokenStream>,
+  field_assignments: &Vec<TokenStream2>,
   field: &Field,
-) -> TokenStream {
+) -> TokenStream2 {
   let (field_name, field_type) = get_name_and_type(field);
-  let field_struct_name = create_field_struct_name(&builder_name, field_name.as_ref().unwrap());
+  let field_struct_name = create_field_struct_name(builder_name, field_name.as_ref().unwrap());
 
   quote! {
       impl #builder_name<#field_struct_name> {
@@ -87,57 +77,62 @@ fn builder_for_final_field(
   }
 }
 
-fn get_assignments_for_fields(fields: &Punctuated<Field, Comma>) -> Vec<TokenStream> {
-  fields
-    .iter()
-    .map(|f| {
-      let (field_name, _) = get_name_and_type(f);
+fn builder_for_field(
+  builder_name: &Ident,
+  field_assignments: &Vec<TokenStream2>,
+  current_field: &Field,
+  next_field_in_list: &Field,
+) -> TokenStream2 {
+  let (field_name, field_type) = get_name_and_type(current_field);
+  let (next_field_name, _) = get_name_and_type(next_field_in_list);
+  let current_field_struct_name =
+    create_field_struct_name(builder_name, field_name.as_ref().unwrap());
+  let next_field_struct_name =
+    create_field_struct_name(builder_name, next_field_name.as_ref().unwrap());
 
-      quote! {
-          #field_name: self.#field_name
-      }
-    })
-    .collect()
-}
-
-fn original_struct_setters(fields: &Punctuated<Field, Comma>) -> Vec<TokenStream> {
-  fields
-    .iter()
-    .map(|f| {
-      let field_name = &f.ident;
-      let field_name_as_string = field_name.as_ref().unwrap().to_string();
-
-      let handle_type = panic_fallback(field_name_as_string);
-
-      quote! {
-          #field_name: self.#field_name.#handle_type
-      }
-    })
-    .collect()
-}
-
-fn panic_fallback(field_name_as_string: String) -> TokenStream {
   quote! {
-      expect(concat!("Field not set: ", #field_name_as_string))
+      impl #builder_name<#current_field_struct_name> {
+          pub fn #field_name(mut self, input: #field_type) -> #builder_name<#next_field_struct_name> {
+              self.#field_name = Some(input);
+              #builder_name {
+                  marker: Default::default(),
+                  #(#field_assignments,)*
+              }
+          }
+      }
   }
 }
 
-pub fn marker_trait_and_structs(
-  struct_name: &Ident,
-  fields: &Punctuated<Field, Comma>,
-) -> TokenStream {
+fn get_assignments_for_fields(fields: &PFields) -> Vec<TokenStream2> {
+  fields
+    .iter()
+    .map(|Field { ident, .. }| {
+      quote! {
+          #ident: self.#ident
+      }
+    })
+    .collect()
+}
+
+fn panic_fallback(field_name: String) -> TokenStream2 {
+  quote! {
+      expect(concat!("Field not set: ", #field_name))
+  }
+}
+
+pub fn marker_trait_and_structs(struct_name: &Ident, fields: &PFields) -> TokenStream2 {
   let builder_name = create_builder_ident(struct_name);
 
-  let structs_and_impls = fields.iter().map(|f| {
-    let field_name = &f.ident.clone().unwrap();
-    let struct_name = create_field_struct_name(&builder_name, field_name);
+  let structs_and_impls = fields.iter().map(|Field { ident, .. }| {
+    let ident = ident.clone().unwrap();
+    let struct_name = create_field_struct_name(&builder_name, &ident);
     quote! {
         pub struct #struct_name {}
         impl MarkerTraitForBuilder for #struct_name {}
     }
   });
 
-  // would actually need more unique name for trait and final builder (and better names for others)
+  // NOTE: Would actually need more unique name for trait and final builder (and better names for others).
   quote! {
       pub trait MarkerTraitForBuilder {}
 
@@ -148,16 +143,15 @@ pub fn marker_trait_and_structs(
   }
 }
 
-pub fn builder_impl_for_struct(
-  struct_name: &Ident,
-  fields: &Punctuated<Field, Comma>,
-) -> TokenStream {
-  let builder_inits = fields.iter().map(|f| {
-    let field_name = &f.ident;
-    quote! { #field_name: None }
+pub fn builder_impl_for_struct(struct_name: &Ident, fields: &PFields) -> TokenStream2 {
+  let builder_inits = fields.iter().map(|Field { ident, .. }| {
+    quote! { #ident: None }
   });
-  // this does assume that we have fields...
-  let first_field_name = fields.first().map(|f| f.ident.clone().unwrap()).unwrap();
+  // NOTE: This does assume that we have fields.
+  let first_field_name = fields
+    .first()
+    .map(|Field { ident, .. }| ident.clone().unwrap())
+    .unwrap(); // unwrapping a 'None' will panic
   let builder_name = create_builder_ident(struct_name);
   let generic = create_field_struct_name(&builder_name, &first_field_name);
 
@@ -173,10 +167,9 @@ pub fn builder_impl_for_struct(
   }
 }
 
-pub fn builder_definition(struct_name: &Ident, fields: &Punctuated<Field, Comma>) -> TokenStream {
-  let builder_fields = fields.iter().map(|f| {
-    let (field_name, field_type) = get_name_and_type(f);
-    quote! { #field_name: Option<#field_type> }
+pub fn builder_definition(struct_name: &Ident, fields: &PFields) -> TokenStream2 {
+  let builder_fields = fields.iter().map(|Field { ident, ty, .. }| {
+    quote! { #ident: Option<#ty> }
   });
   let builder_name = create_builder_ident(struct_name);
 
@@ -188,7 +181,7 @@ pub fn builder_definition(struct_name: &Ident, fields: &Punctuated<Field, Comma>
   }
 }
 
-fn get_name_and_type<'a>(f: &'a Field) -> (&'a Option<Ident>, &'a Type) {
+fn get_name_and_type(f: &Field) -> (&Option<Ident>, &Type) {
   let field_name = &f.ident;
   let field_type = &f.ty;
   (field_name, field_type)

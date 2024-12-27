@@ -1,4 +1,14 @@
-fn main() {}
+#![allow(dead_code, unused_variables)]
+use builder_macro::Builder;
+
+#[derive(Builder)]
+struct Gleipnir {
+  #[builder(rename = "tops_of")]
+  roots_of: String,
+}
+fn main() {
+  let gleipnir = Gleipnir::builder().tops_of("mountains".to_string()).build();
+}
 
 #[cfg(test)]
 mod tests {

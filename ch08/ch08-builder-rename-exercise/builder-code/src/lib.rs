@@ -12,21 +12,22 @@ use syn::FieldsNamed;
 use syn::{parse2, DeriveInput};
 
 pub fn create_builder(item: TokenStream) -> TokenStream {
-  let ast: DeriveInput = parse2(item).unwrap();
-  let name = ast.ident;
+  let derive_input: DeriveInput = parse2(item).unwrap();
+  // eprintln!("{:#?}", derive_input);
+  let name = derive_input.ident;
   let builder = format_ident!("{}Builder", name);
 
-  let fields = match ast.data {
+  let fields = match derive_input.data {
     Struct(DataStruct {
-      fields: Named(FieldsNamed { ref named, .. }),
+      fields: Named(FieldsNamed { named, .. }),
       ..
     }) => named,
     _ => unimplemented!("only implemented for structs"),
   };
-  let builder_fields = builder_field_definitions(fields);
-  let builder_inits = builder_init_values(fields);
-  let builder_methods = builder_methods(fields);
-  let set_fields = original_struct_setters(fields);
+  let builder_fields = builder_field_definitions(&fields);
+  let builder_inits = builder_init_values(&fields);
+  let builder_methods = builder_methods(&fields);
+  let set_fields = original_struct_setters(&fields);
 
   quote! {
       struct #builder {

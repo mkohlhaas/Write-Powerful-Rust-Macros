@@ -1,15 +1,10 @@
 mod fields;
 
-use crate::fields::{
-  builder_field_definitions, builder_init_values, builder_methods, original_struct_setters,
-};
+use crate::fields::{builder_field_definitions, builder_init_values};
+use crate::fields::{builder_methods, original_struct_setters};
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
-use syn::Data::Struct;
-use syn::DataStruct;
-use syn::Fields::Named;
-use syn::FieldsNamed;
-use syn::{parse2, DeriveInput};
+use syn::{parse2, Data::Struct, DataStruct, DeriveInput, Fields::Named, FieldsNamed};
 
 pub fn create_builder(item: TokenStream) -> TokenStream {
   let ast: DeriveInput = parse2(item).unwrap();

@@ -1,5 +1,5 @@
 error: Can only use uppercase for String type
- --> tests/fails/wrong_type.rs:6:5
+ --> tests/fails/wrong_type.rs:6:3
   |
-6 |     roots_of: i32,
-  |     ^^^^^^^^
+6 |   roots_of: i32,
+  |   ^^^^^^^^

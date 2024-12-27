@@ -11,9 +11,7 @@ mod tests {
     struct Gleipnir {
       roots_of: String,
     }
-
     let gleipnir = Gleipnir::builder().build();
-
     assert_eq!(gleipnir.roots_of, String::default());
   }
 
@@ -24,9 +22,7 @@ mod tests {
     struct Gleipnir {
       roots_of: String,
     }
-
     let gleipnir = Gleipnir::builder().build();
-
     assert_eq!(gleipnir.roots_of, String::default());
   }
 }

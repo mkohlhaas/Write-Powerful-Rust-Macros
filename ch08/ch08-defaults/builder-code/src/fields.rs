@@ -1,18 +1,18 @@
-use proc_macro2::TokenStream;
 use quote::quote;
-use syn::punctuated::Punctuated;
-use syn::token::Comma;
-use syn::{Expr, ExprLit, Field, Ident, Lit, Meta, MetaNameValue, Type};
+use syn::__private::TokenStream2;
+use syn::{token::Comma, Expr, ExprLit, Field, Ident, Lit, Meta, MetaNameValue};
 
-pub fn builder_methods(fields: &Punctuated<Field, Comma>) -> Vec<TokenStream> {
+type Fields = syn::punctuated::Punctuated<Field, Comma>;
+
+pub fn builder_methods(fields: &Fields) -> Vec<TokenStream2> {
   fields
     .iter()
-    .map(|f| {
-      let (field_name, field_type) = get_name_and_type(f);
-
-      extract_attribute_from_field(f, "rename")
-        .map(|a| &a.meta)
-        .map(|m| match m {
+    .map(|f @ Field { ident, ty, .. }| {
+      f.attrs
+        .iter()
+        .find(|&attr| attr.path().is_ident("rename"))
+        .map(|attr| &attr.meta)
+        .map(|meta| match meta {
           Meta::NameValue(MetaNameValue {
             value:
               Expr::Lit(ExprLit {
@@ -25,16 +25,16 @@ pub fn builder_methods(fields: &Punctuated<Field, Comma>) -> Vec<TokenStream> {
         })
         .map(|attr| {
           quote! {
-              pub fn #attr(mut self, input: #field_type) -> Self {
-                  self.#field_name = Some(input);
+              pub fn #attr(mut self, input: #ty) -> Self {
+                  self.#ident = Some(input);
                   self
               }
           }
         })
         .unwrap_or_else(|| {
           quote! {
-              pub fn #field_name(mut self, input: #field_type) -> Self {
-                  self.#field_name = Some(input);
+              pub fn #ident(mut self, input: #ty) -> Self {
+                  self.#ident = Some(input);
                   self
               }
           }
@@ -43,100 +43,46 @@ pub fn builder_methods(fields: &Punctuated<Field, Comma>) -> Vec<TokenStream> {
     .collect()
 }
 
-pub fn original_struct_setters(
-  fields: &Punctuated<Field, Comma>,
-  use_defaults: bool,
-) -> Vec<TokenStream> {
+// Returning a Vector to make things easier for us (instead of impl..., or Map...).
+pub fn original_struct_setters(fields: &Fields, is_using_defaults: bool) -> Vec<TokenStream2> {
   fields
     .iter()
-    .map(|f| {
-      let field_name = &f.ident;
-      let field_name_as_string = field_name.as_ref().unwrap().to_string();
+    .map(|Field { ident, .. }| {
+      let field_name = stringify!(#ident);
 
-      let handle_type = if use_defaults {
+      let handle_type: TokenStream2 = if is_using_defaults {
         default_fallback()
       } else {
-        panic_fallback(field_name_as_string)
+        panic_fallback(field_name)
       };
 
       quote! {
-          #field_name: self.#field_name.#handle_type
+          #ident: self.#ident.#handle_type
       }
     })
     .collect()
 }
 
-// alternatives
-// pub fn original_struct_setters<'a>(fields: &'a Punctuated<Field, Comma>, use_defaults: bool) -> Map<Iter<'a, Field>, Box<dyn Fn(&Field) -> TokenStream>>  {
-//     fields.iter().map(Box::new(move |f| {
-//         let (field_name, field_type) = get_name_and_type(&f);
-//         let field_name_as_string = field_name.as_ref().unwrap().to_string();
-//
-//         let handle_type = if use_defaults {
-//             default_fallback()
-//         } else {
-//             panic_fallback(field_name_as_string)
-//         };
-//
-//         quote! {
-//             #field_name: self.#field_name.#handle_type
-//         }
-//     }))
-// }
-//
-// pub fn original_struct_setters(fields: &Punctuated<Field, Comma>, use_defaults: bool) -> impl Iterator<Item = TokenStream> + '_ {
-//     fields.iter().map(move |f| {
-//         let (field_name, field_type) = get_name_and_type(&f);
-//         let field_name_as_string = field_name.as_ref().unwrap().to_string();
-//
-//         let handle_type = if use_defaults {
-//             default_fallback()
-//         } else {
-//             panic_fallback(field_name_as_string)
-//         };
-//
-//         quote! {
-//             #field_name: self.#field_name.#handle_type
-//         }
-//     })
-// }
-
-fn panic_fallback(field_name_as_string: String) -> TokenStream {
-  quote! {
-      expect(concat!("Field not set: ", #field_name_as_string))
-  }
-}
-
-fn default_fallback() -> TokenStream {
+fn default_fallback() -> TokenStream2 {
   quote! {
       unwrap_or_default()
   }
 }
 
-pub fn builder_init_values(
-  fields: &Punctuated<Field, Comma>,
-) -> impl Iterator<Item = TokenStream> + '_ {
-  fields.iter().map(|f| {
-    let field_name = &f.ident;
-    quote! { #field_name: None }
+fn panic_fallback(field_name: &str) -> TokenStream2 {
+  quote! {
+      expect(concat!("Field not set: ", #field_name))
+  }
+}
+
+pub fn builder_init_values(fields: &Fields) -> impl Iterator<Item = TokenStream2> + '_ {
+  fields.iter().map(|Field { ident, .. }| {
+    quote! { #ident: None }
   })
 }
 
-pub fn builder_field_definitions(
-  fields: &Punctuated<Field, Comma>,
-) -> impl Iterator<Item = TokenStream> + '_ {
-  fields.iter().map(|f| {
-    let (field_name, field_type) = get_name_and_type(f);
-    quote! { #field_name: Option<#field_type> }
+pub fn builder_field_definitions(fields: &Fields) -> impl Iterator<Item = TokenStream2> + '_ {
+  fields.iter().map(|Field { ident, ty, .. }| {
+    quote! { #ident: Option<#ty> }
   })
-}
-
-fn get_name_and_type<'a>(f: &'a Field) -> (&'a Option<Ident>, &'a Type) {
-  let field_name = &f.ident;
-  let field_type = &f.ty;
-  (field_name, field_type)
-}
-
-fn extract_attribute_from_field<'a>(f: &'a Field, name: &'a str) -> Option<&'a syn::Attribute> {
-  f.attrs.iter().find(|&attr| attr.path().is_ident(name))
 }
