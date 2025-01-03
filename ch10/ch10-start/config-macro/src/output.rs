@@ -1,8 +1,8 @@
-use proc_macro2::TokenStream;
 use quote::quote;
 use std::collections::HashMap;
+use syn::__private::TokenStream2;
 
-fn generate_inserts(yaml_values: HashMap<String, String>) -> Vec<TokenStream> {
+fn generate_inserts(yaml_values: HashMap<String, String>) -> Vec<TokenStream2> {
   yaml_values
     .iter()
     .map(|v| {
@@ -13,7 +13,7 @@ fn generate_inserts(yaml_values: HashMap<String, String>) -> Vec<TokenStream> {
     .collect()
 }
 
-pub fn generate_config_struct(yaml_values: HashMap<String, String>) -> TokenStream {
+pub fn generate_config_struct(yaml_values: HashMap<String, String>) -> TokenStream2 {
   let inserts = generate_inserts(yaml_values);
 
   quote! {

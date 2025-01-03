@@ -1,12 +1,18 @@
+use std::collections::HashMap;
+
 use config_macro::config_struct;
 
-#[config_struct(exclude = "from")]
+// #[config_struct(exclude = "from")]
+#[config_struct()]
 #[derive(Debug)]
 struct ConfigStruct {}
 
 fn main() {
   let config = ConfigStruct::new();
-  println!("{config:?}");
+  println!("{config:#?}");
+  // let user_admin_map = HashMap::from(config);
+  let user_admin_map: HashMap<_, _> = config.into();
+  println!("{:#?}", user_admin_map);
 }
 
 #[cfg(test)]

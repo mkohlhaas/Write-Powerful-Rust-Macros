@@ -27,12 +27,12 @@ impl Parse for ConfigInput {
     let _: Token!(=) = input
       .parse()
       .map_err(|_| syn::Error::new(input.span(), "expected equals sign after path"))?;
-    let value: LitStr = input
+    let path_name: LitStr = input
       .parse()
       .map_err(|_| syn::Error::new(input.span(), "expected value after the equals sign"))?;
 
     Ok(ConfigInput {
-      path: Some(value.value()),
+      path: Some(path_name.value()),
     })
   }
 }
