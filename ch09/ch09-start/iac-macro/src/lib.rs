@@ -60,8 +60,9 @@ impl Parse for Lambda {
       .expect("we just checked for this token");
     let lambda_name = input
       .parse()
-      .map(|v: Ident| v.to_string())
+      .map(|name: Ident| name.to_string())
       .map_err(|_| syn::Error::new(lambda_token.span, "lambda needs a name"))?;
+
     let mut lambda_memory = None;
     let mut lambda_timeout = None;
 
@@ -72,7 +73,8 @@ impl Parse for Lambda {
           .expect("we just checked for this token");
         lambda_memory = Some(input.parse().map(|v: LitInt| {
           v.to_string().parse().map_err(|_| {
-            syn::Error::new(v.span(), "memory needs a positive value <= 10240") // LitInt will stop most errors, but not negative values or those that are too big
+            // LitInt will stop most errors, but not negative values or those that are too big
+            syn::Error::new(v.span(), "memory needs a positive value <= 10240")
           })
         })??);
       } else if input.peek(kw::time) {
@@ -127,7 +129,13 @@ impl Parse for IacInput {
       }
     }
 
-    if bucket.as_ref().map(|v| v.has_event).unwrap_or(false) && lambda.is_none() {
+    // check if a bucket's event has a required lambda
+    if bucket
+      .as_ref()
+      .map(|bucket| bucket.has_event)
+      .unwrap_or(false)
+      && lambda.is_none()
+    {
       return Err(syn::Error::new(
         input.span(),
         "a lambda is required for an event ('=>')",

@@ -1,5 +1,5 @@
 error: lambda needs a name
- --> tests/fails/no_lambda_name.rs:5:9
+ --> tests/fails/no_lambda_name.rs:5:7
   |
-5 |         lambda
-  |         ^^^^^^
+5 |       lambda
+  |       ^^^^^^

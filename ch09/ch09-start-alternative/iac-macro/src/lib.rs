@@ -51,6 +51,37 @@ struct Lambda {
   pub time: Option<u16>,
 }
 
+impl Parse for Lambda {
+  fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+    let _ = input
+      .parse::<kw::lambda>()
+      .expect("we just checked for this token");
+    let mut lambda_name = None;
+    let mut lambda_memory = None;
+    let mut lambda_timeout = None;
+
+    let content;
+    parenthesized!(content in input);
+
+    let kvs = Punctuated::<KeyValue, Token!(,)>::parse_terminated(&content)?;
+    kvs.into_iter().for_each(|kv| {
+      if kv.key == "name" {
+        lambda_name = Some(kv.value);
+      } else if kv.key == "mem" {
+        lambda_memory = Some(kv.value.parse().unwrap()); // should actually check like before
+      } else if kv.key == "time" {
+        lambda_timeout = Some(kv.value.parse().unwrap());
+      }
+    });
+
+    Ok(Lambda {
+      name: lambda_name.ok_or(syn::Error::new(input.span(), "lambda needs a name"))?,
+      memory: lambda_memory,
+      time: lambda_timeout,
+    })
+  }
+}
+
 #[derive(Debug)]
 struct KeyValue {
   pub key: String,
@@ -88,37 +119,6 @@ impl Parse for KeyValue {
     }?;
 
     Ok(KeyValue { key, value })
-  }
-}
-
-impl Parse for Lambda {
-  fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-    let _ = input
-      .parse::<kw::lambda>()
-      .expect("we just checked for this token");
-    let mut lambda_name = None;
-    let mut lambda_memory = None;
-    let mut lambda_timeout = None;
-
-    let content;
-    parenthesized!(content in input);
-
-    let kvs = Punctuated::<KeyValue, Token!(,)>::parse_terminated(&content)?;
-    kvs.into_iter().for_each(|kv| {
-      if kv.key == "name" {
-        lambda_name = Some(kv.value);
-      } else if kv.key == "mem" {
-        lambda_memory = Some(kv.value.parse().unwrap()); // should actually check like before
-      } else if kv.key == "time" {
-        lambda_timeout = Some(kv.value.parse().unwrap());
-      }
-    });
-
-    Ok(Lambda {
-      name: lambda_name.ok_or(syn::Error::new(input.span(), "lambda needs a name"))?,
-      memory: lambda_memory,
-      time: lambda_timeout,
-    })
   }
 }
 

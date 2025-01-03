@@ -1,5 +1,5 @@
 error: only 'bucket' and 'lambda' resources are supported
- --> tests/fails/lambda_typo.rs:5:9
+ --> tests/fails/lambda_typo.rs:5:7
   |
-5 |         lamba name
-  |         ^^^^^
+5 |       lamba name
+  |       ^^^^^

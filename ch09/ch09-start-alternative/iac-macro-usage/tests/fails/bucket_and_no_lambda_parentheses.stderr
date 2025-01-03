@@ -1,9 +1,9 @@
 error: unexpected end of input, expected parentheses
- --> tests/fails/bucket_and_no_lambda_parentheses.rs:4:5
+ --> tests/fails/bucket_and_no_lambda_parentheses.rs:4:3
   |
-4 | /     iac! {
-5 | |         bucket unique lambda
-6 | |     }
-  | |_____^
+4 | /   iac! {
+5 | |       bucket unique lambda
+6 | |   }
+  | |___^
   |
   = note: this error originates in the macro `iac` (in Nightly builds, run with -Z macro-backtrace for more info)

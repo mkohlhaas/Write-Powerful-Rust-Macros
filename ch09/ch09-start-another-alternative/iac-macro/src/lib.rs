@@ -82,7 +82,7 @@ impl Parse for LambdaProperty {
     } else {
       Err(syn::Error::new(
         input.span(),
-        format!("unknown property for lambda"),
+        "unknown property for lambda".to_string(),
       ))
     }
   }
@@ -99,10 +99,11 @@ where
       "prop name and value should be separated by an equals sign",
     )
   })?;
-  let value = input.parse().map(|v: LitInt| {
-    v.to_string()
+  let value = input.parse().map(|num: LitInt| {
+    num
+      .to_string()
       .parse()
-      .map_err(|_| syn::Error::new(v.span(), error_message))
+      .map_err(|_| syn::Error::new(num.span(), error_message))
   })??;
   Ok(value)
 }
@@ -180,7 +181,7 @@ impl Parse for Lambda {
         LambdaProperty::Time(val) => acc.time(val),
       });
 
-    Ok(builder.build()?)
+    builder.build()
   }
 }
 

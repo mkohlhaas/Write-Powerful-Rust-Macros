@@ -142,18 +142,16 @@ impl Parse for IacInput {
     }
 
     if bucket.as_ref().map(|v| v.has_event).unwrap_or(false) {
-      return if lambda.is_none() {
+      return if let Some(lambda) = lambda {
+        Ok(IacInput::EventBucket(bucket.unwrap(), lambda))
+      } else {
         Err(syn::Error::new(
           input.span(),
           "a lambda is required for an event ('=>')",
         ))
-      } else {
-        Ok(IacInput::EventBucket(
-          bucket.expect("only here when bucket exists"),
-          lambda.expect("just checked that this exists"),
-        ))
       };
     }
+
     Ok(IacInput::Normal(bucket, lambda))
   }
 }

@@ -1,5 +1,5 @@
 error: only 'bucket' and 'lambda' resources are supported
- --> tests/fails/bucket_typo.rs:5:9
+ --> tests/fails/bucket_typo.rs:5:7
   |
-5 |         bucke uniquename
-  |         ^^^^^
+5 |       bucke uniquename
+  |       ^^^^^
