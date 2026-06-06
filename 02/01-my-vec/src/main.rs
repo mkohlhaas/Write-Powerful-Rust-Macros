@@ -1,4 +1,4 @@
-#![allow(dead_code, unused, clippy::vec_init_then_push)]
+#![allow(clippy::vec_init_then_push)]
 
 macro_rules! my_vec {
   // empty vec
@@ -29,18 +29,19 @@ macro_rules! my_vec {
 }
 
 fn main() {
-  // empty vec
-  let empty: Vec<i32> = my_vec![];
-  println!("{:?}", empty);
-  // empty vec
-  let another_empty: Vec<i32> = my_vec![make an empty vec];
-  println!("{:?}", another_empty);
-  // non-empty vec
-  let t = my_vec!(1, 2, 3);
-  println!("{:?}", t);
-  // non-empty vec again
-  let t = my_vec!(1, 2, 3,);
-  println!("{:?}", t);
+  let empty1: Vec<i32> = my_vec![];
+  let empty2: Vec<i32> = my_vec!(make an empty vec);
+  let t1 = my_vec![1];
+  let t2 = my_vec![1,];
+  let t3 = my_vec![1, 2, 3];
+  let t4 = my_vec![1, 2, 3,];
+
+  println!("{:?}", empty1);
+  println!("{:?}", empty2);
+  println!("{:?}", t1);
+  println!("{:?}", t2);
+  println!("{:?}", t3);
+  println!("{:?}", t4);
 }
 
 #[cfg(test)]
@@ -59,6 +60,13 @@ mod tests {
   #[test]
   fn should_create_vec_with_one_element() {
     let actual = my_vec!(1);
+    assert_eq!(actual.len(), 1);
+    assert_eq!(actual[0], 1);
+  }
+
+  #[test]
+  fn should_create_vec_with_one_element_trailing_comma() {
+    let actual = my_vec!(1,);
     assert_eq!(actual.len(), 1);
     assert_eq!(actual[0], 1);
   }
