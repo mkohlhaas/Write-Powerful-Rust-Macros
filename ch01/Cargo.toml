@@ -1,3 +1,0 @@
-[workspace]
-resolver = "2"
-members = ["ch01-first-program", "ch01-generic-functions"]
