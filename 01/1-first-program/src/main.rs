@@ -1,5 +1,7 @@
 use serde::Deserialize;
 
+// Deserialize = deserialize from JSON (as a string) to a Rust structure
+
 #[derive(Debug, Deserialize)]
 struct Request {
   given_name: String,
@@ -15,8 +17,9 @@ fn main() {
     given_name: "Sam".into(),
     last_name: "Hall".into(),
   };
+
   println!("{:?}", r);
-  dbg!(full_name(&r.given_name, &r.last_name));
+  println!("{}", full_name(&r.given_name, &r.last_name));
 }
 
 #[cfg(test)]
