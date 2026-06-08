@@ -10,5 +10,3 @@ macro_rules! greeting {
     base_greeting_fn($greeting, $name)
   };
 }
-
-// pub(crate) use greeting;

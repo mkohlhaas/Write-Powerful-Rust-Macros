@@ -1,3 +1,5 @@
+#![feature(trace_macros)]
+
 use std::ops::{Add, Sub};
 
 #[derive(Debug)]
@@ -25,7 +27,6 @@ impl From<&str> for Currency {
     if value.contains("euro") {
       Currency::Euro
     } else {
-      // simple fallback to dollars
       Currency::Dollar
     }
   }
@@ -33,9 +34,10 @@ impl From<&str> for Currency {
 
 impl Currency {
   fn calculate(&self, amount: u32) -> u32 {
+    use Currency::*;
     match self {
-      Currency::Euro => amount,
-      Currency::Dollar => amount * 2,
+      Euro => amount,
+      Dollar => amount * 2,
     }
   }
 }
@@ -48,6 +50,8 @@ macro_rules! exchange {
 }
 
 fn main() {
+  trace_macros!(true);
+
   let mut the_poor = Account { money: 0 };
 
   exchange!(Give 10 "euros" to the_poor);

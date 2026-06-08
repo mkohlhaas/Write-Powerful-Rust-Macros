@@ -1,8 +1,14 @@
+#![feature(trace_macros)]
+
 use lazy_static::lazy_static;
+
+trace_macros!(true);
 
 lazy_static! {
   static ref EXAMPLE: u8 = 42;
 }
+
+trace_macros!(false);
 
 fn main() {
   println!("Hello, world!");

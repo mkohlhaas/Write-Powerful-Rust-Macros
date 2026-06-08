@@ -1,4 +1,5 @@
 #![allow(unused)]
+#![feature(trace_macros)]
 
 macro_rules! hello_world {
   ($something:ident) => {
@@ -10,7 +11,10 @@ macro_rules! hello_world {
   };
 }
 
+trace_macros!(true);
+
 struct Example;
+
 hello_world!(Example);
 
 fn main() {

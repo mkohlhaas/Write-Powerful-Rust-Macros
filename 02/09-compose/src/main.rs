@@ -1,4 +1,5 @@
 #![allow(dead_code, unused)]
+#![feature(trace_macros)]
 
 fn add_one(n: i32) -> i32 {
   n + 1
@@ -35,6 +36,8 @@ macro_rules! compose_alt {
 }
 
 fn main() {
+  trace_macros!(true);
+
   let two_composed_function = compose_two(compose_two(add_one, stringify), prefix_with("Result: "));
   println!("{:?}", two_composed_function(5));
 
