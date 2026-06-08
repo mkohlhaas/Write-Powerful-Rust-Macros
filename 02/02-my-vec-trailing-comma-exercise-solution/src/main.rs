@@ -4,6 +4,7 @@ macro_rules! my_vec {
     () => {
         Vec::new()
     };
+
     ($($x:expr),+ $(,)?) => (
         {
             let mut v = Vec::new();

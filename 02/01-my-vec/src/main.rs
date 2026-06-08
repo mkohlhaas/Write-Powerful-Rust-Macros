@@ -2,7 +2,7 @@
 
 macro_rules! my_vec {
   // empty vec
-  () => {
+  () => { // NOTE: (), {}, and [] are valid
     Vec::new()
   };
 
@@ -25,7 +25,7 @@ macro_rules! my_vec {
         v.push($x);
     )+
     v
-  }};
+  }}; // NOTE: last ; is optional
 }
 
 fn main() {

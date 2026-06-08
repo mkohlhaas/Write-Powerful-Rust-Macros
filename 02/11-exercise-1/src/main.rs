@@ -12,5 +12,11 @@ macro_rules! count {
 }
 
 // trace_macros!(true);
-
 const CONST: i32 = count!(5);
+
+// expanding `count! { 5 }`
+// to `if 5 == 1 { 1 } else { count! (5 - 1) }`
+// expanding `count! { 5 - 1 }`
+// to `if 5 - 1 == 1 { 1 } else { count! (5 - 1 - 1) }`
+// expanding `count! { 5 - 1 - 1 }`
+// to `if 5 - 1 - 1 == 1 { 1 } else { count! (5 - 1 - 1 - 1) }`

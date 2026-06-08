@@ -1,3 +1,8 @@
+// #![feature(trace_macros)]
+
+use derive_more::AsRef;
+
+#[derive(AsRef, Debug)]
 struct FirstNameExample {
   value: String,
 }
@@ -13,6 +18,7 @@ impl FirstNameExample {
     }
   }
 
+  // NOTE: would be better to implement DEFER trait
   pub fn get_value(&self) -> &String {
     &self.value
   }
@@ -52,9 +58,10 @@ macro_rules! generate_newtypes_methods {
   };
 }
 
+// NOTE: would be better to implement DEFER trait
 macro_rules! generate_get_value_string {
   ($struct_type:ident) => {
-    generate_get_value_string!($struct_type, String);
+    generate_get_value_string!($struct_type, String); // macro can call itself
   };
   ($struct_type:ident,$return_type:ty) => {
     impl $struct_type {
@@ -84,6 +91,7 @@ macro_rules! generate_from_primitive_trait {
   };
 }
 
+// trace_macros!(true);
 generate_get_value_string!(FirstName);
 generate_get_value_string!(LastName);
 generate_get_value_string!(Age, u8);
@@ -96,6 +104,7 @@ generate_from_trait!(FirstName, &str);
 generate_from_trait!(LastName, &str);
 generate_from_primitive_trait!(Age, u8);
 generate_from_primitive_trait!(Pay, i32);
+// trace_macros!(false);
 
 fn calculate_raise(
   first_name: FirstName,
@@ -123,6 +132,11 @@ fn main() {
     Pay::from(1000),
   );
   println!("{:?}", first_raise);
+
+  // {
+  //   let f = FirstNameExample::new("Sam");
+  //   println!("{:?}", &f);
+  // }
 }
 
 #[cfg(test)]

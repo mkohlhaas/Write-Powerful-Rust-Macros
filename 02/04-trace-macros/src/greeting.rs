@@ -6,12 +6,15 @@ macro_rules! greeting {
   ($name:literal) => {
     base_greeting_fn($name, "Hello")
   };
+
   ($name:literal,$greeting:literal) => {
     base_greeting_fn($name, $greeting)
   };
+
   // (test $name:literal) => {
   //   base_greeting_fn($name, "Hello")
   // };
+  //
   (test $name:literal) => {{
     log_syntax!("The name passed to test is ", $name);
     println!("Returning default greeting");

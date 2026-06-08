@@ -6,6 +6,7 @@ macro_rules! greeting {
   ($name:literal) => {
     base_greeting_fn("Hello", $name)
   };
+
   ($greeting:literal, $name:literal) => {
     base_greeting_fn($greeting, $name)
   };

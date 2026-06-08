@@ -13,40 +13,42 @@ fn prefix_with(prefix: &str) -> impl Fn(String) -> String + '_ {
   move |x| format!("{}{}", prefix, x)
 }
 
-fn compose_two<FIRST, SECOND, THIRD, F, G>(f: F, g: G) -> impl Fn(FIRST) -> THIRD
+fn compose_two<F, G, H, FN, GN>(f: FN, g: GN) -> impl Fn(F) -> H
 where
-  F: Fn(FIRST) -> SECOND,
-  G: Fn(SECOND) -> THIRD,
+  FN: Fn(F) -> G,
+  GN: Fn(G) -> H,
 {
   move |x| g(f(x))
 }
 
 macro_rules! compose {
-    ($head:expr) => { $head };
-    ($head:expr, $($tail:expr),+) => {
-        compose_two($head, compose!($($tail),+))
+    ($fn:expr) => { $fn };
+    ($fn:expr, $($fns:expr),+) => {
+        compose_two($fn, compose!($($fns),+))
     }
 }
 
 macro_rules! compose_alt {
-    ($head:expr) => { $head };
-    ($head:expr => $($tail:expr)=>+) => {
-        compose_two($head, compose_alt!($($tail)=>+))
+    ($fn:expr) => { $fn };
+    ($fn:expr => $($fns:expr)=>+) => {
+        compose_two($fn, compose_alt!($($fns)=>+))
     }
 }
 
 fn main() {
-  trace_macros!(true);
-
   let two_composed_function = compose_two(compose_two(add_one, stringify), prefix_with("Result: "));
   println!("{:?}", two_composed_function(5));
 
+  trace_macros!(true);
   let composed = compose!(add_one, stringify, prefix_with("Result: "));
+  trace_macros!(false);
   println!("{:?}", composed(5));
 
+  trace_macros!(true);
   let composed = compose_alt!(
       add_one => stringify => prefix_with("Result: ")
   );
+  trace_macros!(false);
   println!("{:?}", composed(5));
 }
 
