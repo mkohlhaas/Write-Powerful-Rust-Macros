@@ -1,7 +1,7 @@
 [package]
 name = "hello-world-name-to-output"
 version = "0.1.0"
-edition = "2021"
+edition = "2024"
 
 [dependencies]
-hello-world-name-to-output-macro = { path = "./ch03-implemented-macro" }
+hello-world-name-to-output-macro = { path = "./implemented-macro" }

@@ -3,10 +3,10 @@
 
 use hello_world_macro::Hello;
 
-#[allow(dead_code)]
-#[derive(Hello)]
+#[derive(Hello, Debug)]
 struct Example;
 
 fn main() {
-  let _ = Example;
+  let example = Example;
+  println!("{:?}", example);
 }

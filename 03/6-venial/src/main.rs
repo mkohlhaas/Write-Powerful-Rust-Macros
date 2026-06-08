@@ -10,11 +10,15 @@ enum Pet {
 }
 
 fn main() {
-  // Example
-  let e = Example;
-  e.hello_world();
+  {
+    // Example
+    let e = Example;
+    e.hello_world();
+  }
 
-  // Pet
-  let p = Pet::Cat;
-  p.hello_world();
+  {
+    // Pet
+    let p = Pet::Cat;
+    p.hello_world();
+  }
 }

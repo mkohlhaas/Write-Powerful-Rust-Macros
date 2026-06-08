@@ -18,12 +18,18 @@ enum Pet {
 }
 
 fn main() {
-  // Example
-  let e = Example {};
-  e.hello_world();
-  e.another_function();
+  {
+    // Example
+    let e = Example {};
+    e.hello_world();
+    e.another_function();
+  }
 
-  // Pet
-  let p = Pet::Cat;
-  p.hello_world();
+  println!();
+
+  {
+    // Pet
+    let p = Pet::Cat;
+    p.hello_world();
+  }
 }

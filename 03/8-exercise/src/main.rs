@@ -5,7 +5,9 @@ struct Example;
 
 fn main() {
   let e = Example;
+
   e.uppercase();
-  Example::testing_testing();
   e.greeting();
+
+  Example::testing_testing();
 }
