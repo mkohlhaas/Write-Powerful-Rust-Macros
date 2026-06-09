@@ -8,5 +8,6 @@ struct Example;
 
 fn main() {
   let example = Example;
+
   println!("{:?}", example);
 }

@@ -1,13 +1,20 @@
 use hello_world_exercise_macro::UpperCaseName;
 
-#[derive(UpperCaseName)]
+#[derive(Debug, UpperCaseName)]
 struct Example;
 
 fn main() {
-  let e = Example;
+  {
+    let e = Example;
 
-  e.uppercase();
-  e.greeting();
+    e.greeting();
+    println!();
+    e.uppercase();
+  }
 
-  Example::testing_testing();
+  println!();
+
+  {
+    Example::testing_testing();
+  }
 }

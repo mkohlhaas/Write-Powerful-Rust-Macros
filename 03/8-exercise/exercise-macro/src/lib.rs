@@ -17,20 +17,20 @@ pub fn uppercase(item: TokenStream) -> TokenStream {
     impl #name {
       // methods
       fn uppercase(&self) {
+          println!("{}", stringify!(#name));
           println!("{}", #uppercase_name);
       }
 
       fn greeting(&self) {
-          print!("Hello {}! ", #name_str);
+          println!("Hello {}! ", #name_str);
           println!("Hello {}!", stringify!(#name));
-          // println!("Hello {}!", #name); // ⚠️
+          println!("Hello {:?}!", #name);
       }
 
       // associated functions
       fn testing_testing() {
           println!("One two three.");
       }
-
     }
   }
   .into()

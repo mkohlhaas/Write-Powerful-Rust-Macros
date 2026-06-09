@@ -18,5 +18,7 @@ pub fn hello(item: TokenStream) -> TokenStream {
       }
   };
 
+  assert_eq!(stringify!(1 + 1), "1 + 1");
+
   add_hello_world.into()
 }

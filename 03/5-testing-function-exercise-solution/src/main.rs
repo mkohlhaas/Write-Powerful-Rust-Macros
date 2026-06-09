@@ -1,9 +1,19 @@
 #[macro_use]
 extern crate hello_world_testing_function_macro;
 
-#[derive(Hello)]
+#[derive(Debug, Hello)]
 struct Example;
 
 fn main() {
-  Example::testing_testing();
+  {
+    let e = Example {};
+    println!("{:?}", e);
+    e.hello_world();
+  }
+
+  println!();
+
+  {
+    Example::testing_testing();
+  }
 }
