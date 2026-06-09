@@ -28,6 +28,7 @@ mod tests {
 
   #[test]
   fn test_deserialize() {
+    // deserialize from `&str` to `Request`
     let actual: Request =
       serde_json::from_str(r#"{ "given_name": "Test", "last_name": "McTest" }"#)
         .expect("deserialize to work");
