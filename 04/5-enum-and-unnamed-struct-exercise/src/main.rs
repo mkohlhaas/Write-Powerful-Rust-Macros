@@ -23,15 +23,26 @@ enum AnEnumExample {
 struct EmptyStruct {}
 
 fn main() {
-  let e = Example {
-    first: "first".to_string(),
-    second: 5,
-  };
-  println!("{:?}", e);
-  let u = UnnamedExample("first".to_string(), 5.2);
-  println!("{:?}", u);
-  let a = AnEnumExample::First;
-  println!("{:?}", a);
-  let empty = EmptyStruct {};
-  println!("{:?}", empty);
+  {
+    let e = Example {
+      first: "first".to_string(),
+      second: 5,
+    };
+    println!("{:?}", e);
+  }
+
+  {
+    let u = UnnamedExample("first".to_string(), 5.2);
+    println!("{:?}", u);
+  }
+
+  {
+    let a = AnEnumExample::First;
+    println!("{:?}", a);
+  }
+
+  {
+    let empty = EmptyStruct {};
+    println!("{:?}", empty);
+  }
 }

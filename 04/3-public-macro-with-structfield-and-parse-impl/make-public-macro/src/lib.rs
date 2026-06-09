@@ -1,10 +1,10 @@
 use proc_macro::TokenStream;
-use quote::{quote, ToTokens};
+use quote::{ToTokens, quote};
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
 use syn::token::Colon;
-use syn::{parse_macro_input, DeriveInput, Ident, Visibility};
 use syn::{Data::Struct, DataStruct, Fields::Named, FieldsNamed};
+use syn::{DeriveInput, Ident, Visibility, parse_macro_input};
 
 struct StructField {
   name: Ident,
@@ -24,6 +24,8 @@ impl Parse for StructField {
     // eprintln!("{:#?}", input);
     let _vis: Result<Visibility, _> = input.parse();
     let list = Punctuated::<Ident, Colon>::parse_terminated(input).unwrap();
+
+    // eprintln!("Punctuated length: {:#?}", list.len()); // 2
     // eprintln!("{:#?}", _vis);
     // eprintln!("{:#?}", list);
 
@@ -48,10 +50,12 @@ pub fn public(_attr: TokenStream, item: TokenStream) -> TokenStream {
     _ => unimplemented!("only works for structs with named fields"),
   };
 
-  // builder_fields: Map<Iter<'_, Field>, impl FnMut(&Field) -> StructField>
-  let builder_fields = fields.iter().map(|f| {
+  // NOTE: Implements notable traits: `Iterator<Item = StructField>`
+  //
+  // NOTE: is an iterator of StructField's
+  let builder_fields = fields.iter().map(|field| {
     // eprintln!("{:#?}", f.to_token_stream());
-    syn::parse2::<StructField>(f.to_token_stream()).unwrap()
+    syn::parse2::<StructField>(field.to_token_stream()).unwrap()
   });
 
   quote! {

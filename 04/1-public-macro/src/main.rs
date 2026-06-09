@@ -1,5 +1,6 @@
 use make_public_macro::public;
 
+#[derive(Debug)]
 #[public]
 struct Example {
   first: String,
@@ -7,8 +8,10 @@ struct Example {
 }
 
 fn main() {
-  let _e = Example {
+  let example = Example {
     first: "first".into(),
     second: 5,
   };
+
+  println!("{:?}", example);
 }

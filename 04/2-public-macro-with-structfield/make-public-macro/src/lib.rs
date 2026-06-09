@@ -1,14 +1,14 @@
 use proc_macro::TokenStream;
 
-use quote::{quote, ToTokens};
+use quote::{ToTokens, quote};
 use syn::Data::Struct;
 use syn::Fields::Named;
-use syn::{parse_macro_input, DataStruct, DeriveInput, Field, FieldsNamed, Ident, Type};
+use syn::{DataStruct, DeriveInput, Field, FieldsNamed, Ident, Type, parse_macro_input};
 
 struct StructField {
   // name: Ident,
-  // Option's ToTokens trait implementation directs to ToTokens
-  // implementation of Ident
+  //
+  // NOTE: Option's ToTokens trait implementation directs to Ident's ToTokens implementation
   name: Option<Ident>,
   ty: Type,
 }
@@ -45,8 +45,10 @@ pub fn public(_attr: TokenStream, item: TokenStream) -> TokenStream {
     _ => unimplemented!("only works for structs with named fields"),
   };
 
-  // builder_fields: Map<Iter<'_, Field>, fn new(&Field) -> StructField>
-  // point-free mapping (instead of map(|f| StructField::new(f)))
+  // NOTE: - point-free mapping (instead of map(|f| StructField::new(f)))
+  //       - Implements notable traits: `Iterator<Item = StructField>`
+  //
+  // NOTE: is an iterator over StructField's
   let builder_fields = fields.iter().map(StructField::new);
 
   quote! {

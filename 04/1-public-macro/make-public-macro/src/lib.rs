@@ -2,44 +2,43 @@ use proc_macro::TokenStream;
 use quote::quote;
 use syn::Data::Struct;
 use syn::Fields::Named;
-use syn::{parse_macro_input, DataStruct, DeriveInput, FieldsNamed};
+use syn::{DataStruct, DeriveInput, FieldsNamed, parse_macro_input};
 
 #[proc_macro_attribute]
 pub fn public(_attr: TokenStream, item: TokenStream) -> TokenStream {
   let ast: DeriveInput = parse_macro_input!(item);
 
   // print out AST
-  eprintln!("{:#?}", &ast);
+  eprintln!("{:#?}", ast);
 
   let name = ast.ident;
 
   let fields = match ast.data {
     Struct(DataStruct {
-      fields: Named(FieldsNamed { ref named, .. }),
+      fields: Named(FieldsNamed { ref named, .. }), // NOTE: `ref`: don't consume the matched item
       ..
     }) => named,
     _ => unimplemented!("only works for structs with named fields"),
   };
 
-  // builder_fields: Map<Iter<'_, Field>, impl FnMut(&Field) -> TokenStream>
-  let builder_fields = fields.iter().map(|f| {
+  // NOTE: Implements notable traits: `Iterator<Item = TokenStream>`
+  //
+  // NOTE: is an iterator over TokenStream's
+  let builder_fields = fields.iter().map(|field| {
     // Option<Ident> uses ToTokens trait which uses ToTokens of its content (Ident)
-    let name: &Option<syn::Ident> = &f.ident;
-    // eprintln!("{:#?}", &name);
+    let name: &Option<syn::Ident> = &field.ident;
+    eprintln!("Field: {:#?}", name);
 
     // syn::Type also uses ToTokens trait
-    let ty = &f.ty;
-    // eprintln!("{:#?}", &ty);
+    let ty = &field.ty;
+    eprintln!("Field type: {:#?}", ty);
 
-    // let fu = quote! { pub #name: #ty };
-    // eprintln!("{:#?}", &fu);
-    // fu
-
+    // make the field public
     quote! { pub #name: #ty }
   });
 
   // Mapping over builder_fields containing Field's.
-  // Of course Field implements ToToken trait.
+  // Field implements ToToken trait, too. ;-)
   quote! {
     pub struct #name {
       #(#builder_fields,)*

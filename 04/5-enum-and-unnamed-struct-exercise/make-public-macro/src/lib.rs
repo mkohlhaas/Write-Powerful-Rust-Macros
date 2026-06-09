@@ -1,20 +1,21 @@
 use proc_macro::TokenStream;
 use quote::quote;
 use std::iter::Map;
+use syn::Data::{Enum, Struct};
+use syn::Fields::Unnamed;
 use syn::punctuated::{Iter, Punctuated};
 use syn::token::Comma;
-use syn::Data::{Enum, Struct};
-use syn::DataEnum;
-use syn::Fields::Unnamed;
-use syn::{parse_macro_input, DeriveInput, Field, FieldsNamed, FieldsUnnamed, Ident, Variant};
-use syn::{DataStruct, Fields::Named};
+use syn::{
+  DataEnum, DataStruct, DeriveInput, Field, Fields::Named, FieldsNamed, FieldsUnnamed, Ident,
+  Variant, parse_macro_input,
+};
 
 type TokenStream2 = proc_macro2::TokenStream;
 type MapTokenStream2<'a> = Map<Iter<'a, Field>, fn(&Field) -> TokenStream2>;
 type Pfc = Punctuated<Field, Comma>;
 type Pvc = Punctuated<Variant, Comma>;
 
-fn named_fields_public(fields: &Pfc) -> MapTokenStream2 {
+fn named_fields_public(fields: &Pfc) -> MapTokenStream2<'_> {
   fields.iter().map(|f| {
     let name = &f.ident;
     let ty = &f.ty;
@@ -22,7 +23,7 @@ fn named_fields_public(fields: &Pfc) -> MapTokenStream2 {
   })
 }
 
-fn unnamed_fields_public(fields: &Pfc) -> MapTokenStream2 {
+fn unnamed_fields_public(fields: &Pfc) -> MapTokenStream2<'_> {
   fields.iter().map(|f| {
     let ty = &f.ty;
     quote! { pub #ty }

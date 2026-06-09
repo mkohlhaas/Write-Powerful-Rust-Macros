@@ -1,9 +1,9 @@
 use proc_macro::TokenStream;
-use quote::{quote, ToTokens};
+use quote::{ToTokens, quote};
 use syn::parse::{Parse, ParseStream};
 use syn::token::Colon;
-use syn::{parse_macro_input, DeriveInput, Ident, Type, Visibility};
 use syn::{Data::Struct, DataStruct};
+use syn::{DeriveInput, Ident, Type, Visibility, parse_macro_input};
 use syn::{Fields::Named, FieldsNamed};
 
 type TokenStream2 = proc_macro2::TokenStream;
@@ -45,11 +45,10 @@ pub fn public(_attr: TokenStream, item: TokenStream) -> TokenStream {
     _ => unimplemented!("only works for structs with named fields"),
   };
 
-  // builder_fields: Map<syn::Iter<syn::Field>, fn(&Field) -> StructField>
-  // Basically a Map of StructField.
+  // NOTE: Implements notable traits: `Iterator<Item = StructField>`
   let builder_fields = fields
     .iter()
-    .map(|f| syn::parse2::<StructField>(f.to_token_stream()).unwrap());
+    .map(|field| syn::parse2::<StructField>(field.to_token_stream()).unwrap());
 
   let public_version = quote! {
       pub struct #name {
