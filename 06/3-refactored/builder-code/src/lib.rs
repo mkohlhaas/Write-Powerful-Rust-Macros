@@ -1,8 +1,7 @@
 mod fields;
 
-use fields::{
-  builder_field_definitions, builder_init_values, builder_methods, original_struct_setters,
-};
+use fields::{builder_field_definitions, builder_init_values};
+use fields::{builder_methods, original_struct_setters};
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use syn::Data::Struct;

@@ -11,8 +11,8 @@ struct Gleipnir {
 }
 
 fn main() {
-  let _fu = ExampleStructNoFields {};
-  let _gleipnir = Gleipnir::builder()
+  let _ = ExampleStructNoFields {};
+  let _ = Gleipnir::builder()
     .roots_of("mountains".to_string())
     .breath_of_a_fish(1)
     .build();
