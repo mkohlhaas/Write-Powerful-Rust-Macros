@@ -3,7 +3,7 @@ use quote::quote;
 use syn::__private::{Span, TokenStream2};
 use syn::Data::Struct;
 use syn::Fields::Named;
-use syn::{parse_macro_input, DataStruct, DeriveInput, FieldsNamed, Ident, Type};
+use syn::{DataStruct, DeriveInput, FieldsNamed, Ident, Type, parse_macro_input};
 
 fn get_field_info(ast: &DeriveInput) -> Vec<(&Ident, &Type)> {
   match ast.data {
@@ -14,9 +14,9 @@ fn get_field_info(ast: &DeriveInput) -> Vec<(&Ident, &Type)> {
     _ => unimplemented!("only works for structs with named fields"),
   }
   .iter()
-  .map(|f| {
-    let field_name = f.ident.as_ref().unwrap();
-    let type_name = &f.ty;
+  .map(|field| {
+    let field_name = field.ident.as_ref().unwrap();
+    let type_name = &field.ty;
 
     (field_name, type_name)
   })
@@ -26,8 +26,8 @@ fn get_field_info(ast: &DeriveInput) -> Vec<(&Ident, &Type)> {
 fn generated_methods(fields: &Vec<(&Ident, &Type)>) -> Vec<TokenStream2> {
   fields
     .iter()
-    .map(|f| {
-      let (field_name, type_name) = f;
+    .map(|field_info| {
+      let (field_name, type_name) = field_info;
       let method_name = Ident::new(&format!("get_{field_name}"), Span::call_site());
 
       quote!(
@@ -42,9 +42,9 @@ fn generated_methods(fields: &Vec<(&Ident, &Type)>) -> Vec<TokenStream2> {
 fn generate_private_fields(fields: &Vec<(&Ident, &Type)>) -> Vec<TokenStream2> {
   fields
     .iter()
-    .map(|(field_name, type_name)| {
+    .map(|(field_name, r#type)| {
       quote!(
-          #field_name: #type_name
+          #field_name: #r#type
       )
     })
     .collect()
@@ -63,13 +63,11 @@ pub fn private(item: TokenStream) -> TokenStream {
           #(#output_fields,)*
       }
 
-      // NOTE: This is hardcoded!!!
       impl #name {
-          // NOTE: We would need params here. How to handle '&str' as input?
           pub fn new() -> Self {
               #name {
-                  string_value: "value".to_string(),
-                  number_value: 2,
+                  string: "String".to_string(),
+                  number: 42,
               }
           }
 

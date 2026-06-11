@@ -1,19 +1,20 @@
 use proc_macro::TokenStream;
 
 use proc_macro2::Ident;
-use quote::{quote, ToTokens};
+use quote::{ToTokens, quote};
 use syn::parse::{Parse, ParseStream};
-use syn::parse_macro_input;
 use syn::punctuated::Punctuated;
 use syn::token::FatArrow;
+use syn::{Error, parse_macro_input};
 
 struct ComposeInput {
   expressions: Punctuated<Ident, FatArrow>,
 }
 
 impl Parse for ComposeInput {
-  fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+  fn parse(input: ParseStream) -> Result<Self, Error> {
     Ok(ComposeInput {
+      // => (aka FatArrow; Token!(=>) should return the result of the FatArrow)
       expressions: Punctuated::<Ident, FatArrow>::parse_terminated(input).unwrap(),
     })
   }
@@ -47,14 +48,15 @@ pub fn compose(item: TokenStream) -> TokenStream {
 
   quote!(
       {
-          fn compose_two<FIRST, SECOND, THIRD, F, G>(first: F, second: G)
-          -> impl Fn(FIRST) -> THIRD
+          fn compose_two<F, G, H, Fn1, Fn2>(first: Fn1, second: Fn2)
+          -> impl Fn(F) -> H
           where
-              F: Fn(FIRST) -> SECOND,
-              G: Fn(SECOND) -> THIRD,
+              Fn1: Fn(F) -> G,
+              Fn2: Fn(G) -> H,
           {
               move |x| second(first(x))
           }
+
           #ci
       }
   )

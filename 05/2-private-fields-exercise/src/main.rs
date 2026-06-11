@@ -3,10 +3,10 @@ use crate::other_file::Example;
 mod other_file;
 
 fn main() {
-  let e = Example::new();
+  let ex = Example::new();
 
-  e.get_string_value();
-  e.get_number_value();
+  ex.get_string();
+  ex.get_number();
 }
 
 #[cfg(test)]
@@ -15,9 +15,9 @@ mod tests {
 
   #[test]
   fn generates_necessary_methods() {
-    let e = Example::new();
+    let ex = Example::new();
 
-    assert_eq!(e.get_string_value(), &"value");
-    assert_eq!(e.get_number_value(), &2);
+    assert_eq!(ex.get_string(), &"String");
+    assert_eq!(ex.get_number(), &42);
   }
 }

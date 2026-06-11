@@ -2,21 +2,19 @@ use private_macro::private;
 
 private!(
   struct Example {
-    string_value: String,
-    number_value: i32,
+    string: String,
+    number: i32,
   }
 );
 
 fn main() {
-  let e = Example {
-    string_value: "value".to_string(),
-    number_value: 2,
+  let ex = Example {
+    string: "I'm a String.".to_string(),
+    number: 42,
   };
 
-  let sv: &String = e.get_string_value();
-  let nv: &i32 = e.get_number_value();
-  println!("String value: {:?}", sv);
-  println!("Number value: {:?}", nv);
+  println!("String value: {:?}", ex.get_string());
+  println!("Number value: {:?}", ex.get_number());
 }
 
 #[cfg(test)]
@@ -25,12 +23,12 @@ mod tests {
 
   #[test]
   fn generates_necessary_methods() {
-    let e = Example {
-      string_value: "value".to_string(),
-      number_value: 2,
+    let ex = Example {
+      string: "String".to_string(),
+      number: 42,
     };
 
-    assert_eq!(e.get_string_value(), &"value");
-    assert_eq!(e.get_number_value(), &2);
+    assert_eq!(ex.get_string(), &"String");
+    assert_eq!(ex.get_number(), &42);
   }
 }

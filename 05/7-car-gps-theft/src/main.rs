@@ -1,3 +1,10 @@
+// Explaining partial moves 2/2
+
+// Solutions:
+// 1. use a reference
+// 2. clone
+// 3. take(…), replace(…), …
+
 #![allow(unused)]
 
 #[derive(Debug)]
@@ -8,7 +15,7 @@ struct Car {
 }
 
 fn steal(item: String) {
-  println!("I am stealing {item}");
+  println!("I am stealing {item}.");
 }
 
 fn main() {
@@ -18,7 +25,10 @@ fn main() {
     infotainment: "Android".to_string(),
   };
   println!("My car before the theft: {car:?}.");
+
+  // NOTE: use take or replace to avoid partial moves
   steal(car.gps.take().unwrap());
+
   // works, though the gps is now missing (None)
   println!("My car after theft: {car:?}.");
 }

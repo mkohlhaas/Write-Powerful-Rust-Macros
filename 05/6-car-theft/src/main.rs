@@ -1,3 +1,5 @@
+// Explaining partial moves 1/2
+
 #![allow(unused)]
 
 #[derive(Debug)]
@@ -17,8 +19,9 @@ fn main() {
     gps: "Garmin".to_string(),
     infotainment: "Android".to_string(),
   };
+
   println!("My car before the theft: {car:?}.");
   steal(car.gps);
-  // "value partially moved" when uncommenting this line:
-  // println!("My car after the theft: {car:?}"); // does not compile
+
+  // println!("My car after the theft: {car:?}"); // ⚠️ does not compile
 }

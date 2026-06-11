@@ -1,10 +1,10 @@
 use proc_macro::TokenStream;
 use proc_macro2::Ident;
-use quote::{quote, ToTokens};
+use quote::{ToTokens, quote};
 use syn::__private::TokenStream2;
 use syn::parse::{Parse, ParseStream};
 use syn::punctuated::Punctuated;
-use syn::{parse_macro_input, Token};
+use syn::{Error, Token, parse_macro_input};
 
 #[derive(Debug)]
 struct ComposeInput {
@@ -12,29 +12,30 @@ struct ComposeInput {
 }
 
 impl Parse for ComposeInput {
-  fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+  fn parse(input: ParseStream) -> Result<Self, Error> {
     Ok(ComposeInput {
       expressions: Punctuated::<Ident, Token!(.)>::parse_terminated(input).unwrap(),
     })
   }
 }
 
-// NOTE: Composing function with only one function does not work.
+// NOTE: Composing functions with only one function does not work.
 impl ToTokens for ComposeInput {
   fn to_tokens(&self, tokens: &mut TokenStream2) {
-    let mut total = None;
+    let mut total: Option<TokenStream2> = None;
     let mut as_idents: Vec<&Ident> = self.expressions.iter().collect();
-    let last_ident = as_idents.pop().unwrap();
+    // eprintln!("{:?}", as_idents.len());
+    let last_fun = as_idents.pop().unwrap();
 
-    as_idents.iter().rev().for_each(|fn_ident| match &total {
+    as_idents.iter().rev().for_each(|fun| match &total {
       None => {
         total = Some(quote!(
-          compose_two(#fn_ident, #last_ident)
+          compose_two(#fun, #last_fun)
         ));
       }
-      Some(current_total) => {
+      Some(current) => {
         total = Some(quote!(
-          compose_two(#fn_ident, #current_total)
+          compose_two(#fun, #current)
         ));
       }
     });
@@ -49,15 +50,15 @@ pub fn compose(item: TokenStream) -> TokenStream {
 
   quote!(
     {
-      // local helper function
-      fn compose_two<FIRST, SECOND, THIRD, F, G>(first: F, second: G)
-      -> impl Fn(FIRST) -> THIRD
+      fn compose_two<F, G, H, Fn1, Fn2>(first: Fn1, second: Fn2)
+      -> impl Fn(F) -> H
       where
-          F: Fn(FIRST) -> SECOND,
-          G: Fn(SECOND) -> THIRD,
+          Fn1: Fn(F) -> G,
+          Fn2: Fn(G) -> H,
       {
           move |x| second(first(x))
       }
+
       #ci
     }
   )

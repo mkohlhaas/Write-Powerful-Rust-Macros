@@ -1,13 +1,11 @@
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
-// use syn::__private::{Span, TokenStream2};
-use syn::__private::TokenStream2;
-// use syn::{parse_macro_input, DataStruct, DeriveInput, FieldsNamed, Ident};
-use syn::{parse_macro_input, DataStruct, DeriveInput, FieldsNamed, Ident, Type};
+use syn::__private::TokenStream2; // importing private stuff
 use syn::{Data::Struct, Fields::Named};
+use syn::{DataStruct, DeriveInput, FieldsNamed, Ident, Type, parse_macro_input};
 
 fn generated_methods(ast: &DeriveInput) -> Vec<TokenStream2> {
-  // eprintln!("{:#?}", &ast);
+  // dbg!("{:#?}", &ast);
   let named_fields = match ast.data {
     Struct(DataStruct {
       fields: Named(FieldsNamed { ref named, .. }),
@@ -21,7 +19,6 @@ fn generated_methods(ast: &DeriveInput) -> Vec<TokenStream2> {
     .map(|field| {
       let field_name: &Ident = field.ident.as_ref().unwrap();
       let type_name: &Type = &field.ty;
-      // let method_name = Ident::new(&format!("get_{field_name}"), Span::call_site());
       let method_name = format_ident!("get_{field_name}");
 
       quote!(
@@ -38,8 +35,9 @@ pub fn private(item: TokenStream) -> TokenStream {
   let struct_as_stream: TokenStream2 = item.clone().into();
   let ast: DeriveInput = parse_macro_input!(item);
   let name = &ast.ident;
-  let methods = generated_methods(&ast);
+  let methods: Vec<TokenStream2> = generated_methods(&ast);
 
+  // impl's have access to private struct fields
   quote!(
       #struct_as_stream
 

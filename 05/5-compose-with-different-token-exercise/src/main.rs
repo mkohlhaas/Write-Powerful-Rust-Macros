@@ -10,7 +10,7 @@ fn stringify(n: i32) -> String {
 
 fn main() {
   let compose = compose!(add_one => add_one => stringify);
-  println!("{:?}", compose(5));
+  println!("{:?}", compose(42));
 }
 
 #[cfg(test)]
@@ -21,8 +21,8 @@ mod tests {
   fn basic_test() {
     let compose = compose!(add_one => add_one => stringify);
 
-    let actual = compose(5);
+    let actual = compose(42);
 
-    assert_eq!(actual, "7");
+    assert_eq!(actual, "44");
   }
 }
