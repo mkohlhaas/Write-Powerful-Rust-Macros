@@ -1,4 +1,4 @@
-mod fields;
+mod fields; // NOTE: use fields.rs in the same directory
 
 use fields::{
   builder_field_definitions, builder_init_values, builder_methods, original_struct_setters,

@@ -1,13 +1,12 @@
 use quote::quote;
-use syn::{__private::TokenStream2, punctuated::Punctuated, token::Comma, Field};
+use syn::{__private::TokenStream2, Field, punctuated::Punctuated, token::Comma};
 
 pub fn original_struct_setters(
   fields: &Punctuated<Field, Comma>,
 ) -> impl Iterator<Item = TokenStream2> + '_ {
   fields.iter().map(|Field { ident, .. }| {
     quote! {
-        #ident: self.#ident
-            .expect(concat!("field not set: ", stringify!(#ident)))
+        #ident: self.#ident.expect(concat!("field not set: ", stringify!(#ident)))
     }
   })
 }

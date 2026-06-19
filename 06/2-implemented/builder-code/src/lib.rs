@@ -1,6 +1,6 @@
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
-use syn::{Data::Struct, DataStruct, DeriveInput, Fields::Named, FieldsNamed};
+use syn::{Data::Struct, DataStruct, DeriveInput, Field, Fields::Named, FieldsNamed, Ident};
 
 pub fn create_builder(item: TokenStream) -> TokenStream {
   let ast: DeriveInput = syn::parse2(item).unwrap();
@@ -41,15 +41,25 @@ pub fn create_builder(item: TokenStream) -> TokenStream {
   });
 
   // copy values from builder to original struct
-  let set_fields_in_original_struct = fields.iter().map(|field| {
-    let field_name = &field.ident;
+  let set_fields_in_original_struct = fields.iter().map(|field: &Field| {
+    let field_name: &Option<Ident> = &field.ident;
     let field_name_as_string = field_name.as_ref().unwrap().to_string();
 
+    // NOTE:
+    // "Any type implementing the ToTokens trait can be interpolated."
+    // https://docs.rs/quote/latest/quote/macro.quote.html#interpolation
+    // Options can be interpolated as they implement ToTokens and interpolate what's inside `Some`.
+    // `None`s are ignored.
+    // https://docs.rs/quote/latest/src/quote/to_tokens.rs.html#114-120
+    // Same for `str`.
+    // https://docs.rs/quote/latest/src/quote/to_tokens.rs.html#122-126
+
+    // NOTE: For now we expect fields to be of type `String`.
     quote! {
         // copy fields
         #field_name: self.#field_name.as_ref()
             .expect(&format!("field {} not set", #field_name_as_string))
-            .to_string()
+            .to_string() // as we can’t just “move” out of the field, we do a to_string to get a copy of the value
     }
   });
 

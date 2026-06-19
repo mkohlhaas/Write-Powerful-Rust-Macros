@@ -1,7 +1,8 @@
 mod fields;
 
-use fields::{builder_field_definitions, builder_init_values};
-use fields::{builder_methods, original_struct_setters};
+use fields::{
+  builder_field_definitions, builder_init_values, builder_methods, original_struct_setters,
+};
 use proc_macro2::TokenStream;
 use quote::{format_ident, quote};
 use syn::Data::Struct;
@@ -13,7 +14,7 @@ use syn::FieldsNamed;
 pub fn create_builder(item: TokenStream) -> TokenStream {
   let ast: DeriveInput = syn::parse2(item).unwrap();
   let name = ast.ident;
-  let builder = format_ident!("{}Builder", name);
+  let builder_name = format_ident!("{}Builder", name);
 
   let fields = match ast.data {
     Struct(DataStruct {
@@ -22,16 +23,18 @@ pub fn create_builder(item: TokenStream) -> TokenStream {
     }) => named,
     _ => unimplemented!("only implemented for structs"),
   };
+
   let builder_fields = builder_field_definitions(fields);
   let builder_inits = builder_init_values(fields);
   let builder_methods = builder_methods(fields);
   let set_fields = original_struct_setters(fields);
 
   quote! {
-      struct #builder {
+      struct #builder_name {
           #(#builder_fields,)*
       }
-      impl #builder {
+
+      impl #builder_name {
           #(#builder_methods)*
 
           pub fn build(self) -> #name {
@@ -40,9 +43,10 @@ pub fn create_builder(item: TokenStream) -> TokenStream {
               }
           }
       }
+
       impl #name {
-          pub fn builder() -> #builder {
-              #builder {
+          pub fn builder() -> #builder_name {
+              #builder_name {
                   #(#builder_inits,)*
               }
           }
@@ -61,6 +65,8 @@ mod tests {
             string_value: String,
         }
     };
+    let _actual = create_builder(input);
+
     let _expected = quote! {
         struct StructWithOneFieldBuilder {
             string_value: Option<String>,
@@ -90,10 +96,8 @@ mod tests {
         }
     };
 
-    let _actual = create_builder(input);
-
     // Text comparison is stupid!
-    // assert_eq!(actual.to_string(), expected.to_string());
+    // assert_eq!(_actual.to_string(), _expected.to_string());
     //
     // dummy assertion
     assert_eq!(1, 1)

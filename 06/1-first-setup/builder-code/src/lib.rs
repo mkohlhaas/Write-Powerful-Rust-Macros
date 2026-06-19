@@ -30,10 +30,11 @@ mod tests {
     let input = quote! {
         struct StructWithNoFields {}
     };
+    let actual = create_builder(input);
+
     let expected = quote! {
         struct StructWithNoFieldsBuilder {}
     };
-    let actual = create_builder(input);
     assert_eq!(actual.to_string(), expected.to_string());
   }
 
@@ -43,6 +44,10 @@ mod tests {
         struct StructWithNoFields {}
     };
     let actual = create_builder(input);
+
+    // `DeriveInput` is a data structure from the syn crate that represents the Abstract Syntax Tree
+    // (AST) of a struct, enum, or union when writing a custom derive procedural macro.
+    // We know that `actual` represents a struct. So we can parse it as such.
     let actual_derived: DeriveInput = syn::parse2(actual).unwrap();
     let name = actual_derived.ident;
     assert_eq!(name.to_string(), "StructWithNoFieldsBuilder");

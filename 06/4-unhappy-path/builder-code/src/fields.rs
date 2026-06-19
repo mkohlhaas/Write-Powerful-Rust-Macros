@@ -63,6 +63,7 @@ mod tests {
 
   use super::*;
 
+  // NOTE: `quote` and `parse2` can’t help us since `Field` does not implement `Parse`.
   #[test]
   fn get_name_and_type_give_back_name() {
     let p = PathSegment {
@@ -71,6 +72,7 @@ mod tests {
     };
     let mut pun = Punctuated::new();
     pun.push(p);
+
     let ty = Type::Path(TypePath {
       qself: None,
       path: Path {
