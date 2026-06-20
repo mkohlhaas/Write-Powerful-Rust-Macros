@@ -1,0 +1,6 @@
+- Regarding "Traverse" on page 153.
+  - [The Many Neat Tricks of Rust’s `collect` from the book's author](https://medium.com/@sam.van.overmeire/the-many-neat-tricks-of-rusts-collect-ab7e185f6fee)
+  - [Collect in Rust, traverse in Haskell and Scala](https://academy.fpblock.com/blog/collect-rust-traverse-haskell-scala/)
+  - [Purescript's `sequence` in Traversable](https://pursuit.purescript.org/packages/purescript-foldable-traversable/6.0.0/docs/Data.Traversable#t:Traversable)
+    - `sequence :: forall a m. Applicative m => t (m a) -> m (t a)`
+  - See page 551 in "Functional Programming Made Easier" by Charles Scalfani.

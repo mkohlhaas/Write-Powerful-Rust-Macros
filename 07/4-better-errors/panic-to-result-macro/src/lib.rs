@@ -149,7 +149,7 @@ pub fn panic_to_result(_attr: TokenStream, item: TokenStream) -> TokenStream {
     (Ok(_), Err(signature_err)) => return signature_err.to_compile_error().into(),
     (Err(statement_err), Ok(_)) => return statement_err.to_compile_error().into(),
     (Err(mut statement_err), Err(signature_err)) => {
-      statement_err.combine(signature_err);
+      statement_err.combine(signature_err); // NOTE: add another error message
       return statement_err.to_compile_error().into();
     }
   };
