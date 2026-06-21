@@ -9,8 +9,10 @@ pub fn optional_default_asserts(fields: &Fields) -> Vec<TokenStream2> {
     .iter()
     .map(|Field { ident, ty, .. }| {
       let ident = ident.as_ref().unwrap();
+      // NOTE: using to underscores for avoiding collision with user code
       let assertion_ident = format_ident!("__{}DefaultAssertion", ident);
 
+      // empty struct, giving it a where clause that requires a field’s type to implement Default
       quote_spanned! {ty.span()=>
           struct #assertion_ident where #ty: core::default::Default;
       }
@@ -84,7 +86,7 @@ fn panic_fallback(field_name: &str) -> TokenStream2 {
 
 fn default_fallback() -> TokenStream2 {
   quote! {
-      unwrap_or_default()
+      unwrap_or_default() // use Default::default() if no value provided
   }
 }
 

@@ -11,7 +11,9 @@ const DEFAULTS_ATTRIBUTE_NAME: &str = "builder_defaults";
 pub fn create_builder(item: TokenStream2) -> TokenStream2 {
   let derive_input: DeriveInput = parse2(item).unwrap();
 
+  // save for later (workaround the borrow checker)
   let is_using_defaults: bool = using_defaults(&derive_input);
+
   let name = derive_input.ident;
   let builder = format_ident!("{}Builder", name);
 
@@ -52,8 +54,9 @@ pub fn create_builder(item: TokenStream2) -> TokenStream2 {
 }
 
 fn using_defaults(derive_input: &DeriveInput) -> bool {
+  dbg!(derive_input);
   derive_input
     .attrs
     .iter()
-    .any(|attribute| attribute.path().is_ident(DEFAULTS_ATTRIBUTE_NAME))
+    .any(|attribute: &syn::Attribute| attribute.path().is_ident(DEFAULTS_ATTRIBUTE_NAME))
 }

@@ -11,9 +11,11 @@ pub fn builder_methods(fields: &Fields) -> Vec<TokenStream> {
     .map(|f @ Field { ident, ty, .. }| {
       f.attrs
         .iter()
+        // find returns an Option (all the mapping functions afterwards map over this Option)
         .find(|&attr| attr.path().is_ident("rename")) // NOTE: here is the "rename" attribute
         .map(|attr| &attr.meta)
         .map(|meta: &Meta| {
+          // dbg!(meta); // let's see how this looks like
           match meta {
             // NOTE: this time we use a NameValue
             Meta::NameValue(MetaNameValue {

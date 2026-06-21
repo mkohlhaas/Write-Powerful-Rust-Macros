@@ -10,12 +10,9 @@ const DEFAULTS_ATTRIBUTE_NAME: &str = "builder_defaults";
 
 pub fn create_builder(item: TokenStream2) -> TokenStream2 {
   let derive_input: DeriveInput = parse2(item).unwrap();
+  let is_using_defaults: bool = using_defaults(&derive_input);
   let name = derive_input.ident;
   let builder = format_ident!("{}Builder", name);
-  let is_using_defaults: bool = derive_input
-    .attrs
-    .iter()
-    .any(|attribute| attribute.path().is_ident(DEFAULTS_ATTRIBUTE_NAME));
 
   let fields = match derive_input.data {
     Struct(DataStruct {
@@ -60,4 +57,12 @@ pub fn create_builder(item: TokenStream2) -> TokenStream2 {
 
       #(#default_assertions)*
   }
+}
+
+fn using_defaults(derive_input: &DeriveInput) -> bool {
+  dbg!(derive_input);
+  derive_input
+    .attrs
+    .iter()
+    .any(|attribute: &syn::Attribute| attribute.path().is_ident(DEFAULTS_ATTRIBUTE_NAME))
 }
