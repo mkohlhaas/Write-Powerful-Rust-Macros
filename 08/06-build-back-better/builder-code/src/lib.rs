@@ -1,4 +1,5 @@
 mod fields;
+mod res;
 mod util;
 
 use crate::fields::{builder_definition, builder_impl_for_struct};
@@ -24,6 +25,12 @@ pub fn create_builder(item: TokenStream2) -> TokenStream2 {
   let builder_method_for_struct = builder_impl_for_struct(&name, &fields);
   let builder_methods = builder_methods(&name, &fields);
 
+  // panic!("{}", marker_and_structs); // during run-time
+  // panic!("{}", builder); // during run-time
+  // println!("{}", builder); // during run-time
+  // println!("{}", builder_method_for_struct); // during run-time
+  // println!("{}", builder_methods); // during run-time
+
   let res = quote! {
       #marker_and_structs
       #builder
@@ -31,6 +38,9 @@ pub fn create_builder(item: TokenStream2) -> TokenStream2 {
       #builder_methods
   };
 
-  println!("{}", res);
+  // NOTE: generated output!
+  // println!("{}", res); // during compile-time
+  // panic!("{}", res); // during run-time
+
   res
 }

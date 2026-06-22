@@ -1,3 +1,8 @@
+// Macro generated code.
+// From println! or panic! at lib.rs:41
+
+#![allow(dead_code, non_camel_case_types)]
+
 pub trait MarkerTraitForBuilder {}
 pub struct roots_ofOfGleipnirBuilder {}
 impl MarkerTraitForBuilder for roots_ofOfGleipnirBuilder {}
@@ -7,12 +12,21 @@ pub struct anything_elseOfGleipnirBuilder {}
 impl MarkerTraitForBuilder for anything_elseOfGleipnirBuilder {}
 pub struct FinalBuilder {}
 impl MarkerTraitForBuilder for FinalBuilder {}
+
 pub struct GleipnirBuilder<T: MarkerTraitForBuilder> {
   marker: std::marker::PhantomData<T>,
   roots_of: Option<String>,
   breath_of_a_fish: Option<u8>,
   anything_else: Option<bool>,
 }
+
+#[allow(dead_code)]
+pub struct Gleipnir {
+  roots_of: String,
+  breath_of_a_fish: u8,
+  anything_else: bool,
+}
+
 impl Gleipnir {
   pub fn builder() -> GleipnirBuilder<roots_ofOfGleipnirBuilder> {
     GleipnirBuilder {
