@@ -9,7 +9,6 @@ use syn::{Data::Struct, DataStruct, Fields::Named, FieldsNamed};
 
 pub fn create_builder(item: TokenStream2) -> TokenStream2 {
   let derive_input: DeriveInput = parse2(item).unwrap();
-  dbg!(&derive_input);
   let name = derive_input.ident;
 
   let fields = match derive_input.data {
@@ -25,10 +24,13 @@ pub fn create_builder(item: TokenStream2) -> TokenStream2 {
   let builder_method_for_struct = builder_impl_for_struct(&name, &fields);
   let builder_methods = builder_methods(&name, &fields);
 
-  quote! {
+  let res = quote! {
       #marker_and_structs
       #builder
       #builder_method_for_struct
       #builder_methods
-  }
+  };
+
+  println!("{}", res);
+  res
 }
