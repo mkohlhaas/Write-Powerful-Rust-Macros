@@ -39,7 +39,7 @@ fn main() {
     marker: Default::default(),
   };
 
-  // Switch the following two lines and see the type of light changing:
+  // Switch the following two lines and see the type of `light` changing:
   light.turn_red().turn_green();
   // light.turn_green().turn_red();
 
