@@ -1,12 +1,13 @@
 #![allow(dead_code)]
+#![feature(iter_collect_into)]
 
 use proc_macro::TokenStream;
 
 use quote::quote;
 use syn::meta::ParseNestedMeta;
 use syn::parse::{ParseStream, Parser};
-use syn::{parse_macro_input, DataStruct, DeriveInput, FieldsNamed, Ident, MetaList, Token};
-use syn::{punctuated::Punctuated, Data::Struct, Field, Fields::Named};
+use syn::{Data::Struct, Field, Fields::Named, punctuated::Punctuated};
+use syn::{DataStruct, DeriveInput, FieldsNamed, Ident, MetaList, Token, parse_macro_input};
 
 const EXCLUDE_ATTRIBUTE_NAME: &str = "exclude";
 
@@ -33,12 +34,7 @@ impl AlternativeExcludedFields {
     name
       .as_ref()
       .map(|ident| ident.to_string())
-      .map(|a_string| {
-        self
-          .fields
-          .iter()
-          .any(|other_string| *other_string == a_string)
-      })
+      .map(|a_string| self.fields.contains(&a_string))
       .unwrap_or_else(|| false)
   }
 }
@@ -76,20 +72,13 @@ impl ExcludedFields {
     name
       .as_ref()
       .map(|ident| ident.to_string())
-      .map(|a_string| {
-        self
-          .fields
-          .iter()
-          .any(|other_string| *other_string == a_string)
-      })
+      .map(|a_string| self.fields.contains(&a_string))
       .unwrap_or_else(|| false)
   }
 }
 
 #[proc_macro_attribute]
 pub fn public(attr: TokenStream, item: TokenStream) -> TokenStream {
-  // eprintln!("Debug: {:#?}", &attr);
-  // eprintln!("Debug: {:#?}", &item);
   let derive_input = parse_macro_input!(item as DeriveInput);
   let mut excluded_fields = AlternativeExcludedFields::default();
   let attr_parser = syn::meta::parser(|meta| excluded_fields.parse(meta));
@@ -113,11 +102,16 @@ pub fn public(attr: TokenStream, item: TokenStream) -> TokenStream {
     }
   });
 
+  // TODO:
+  // builder_fields.into::<Vec<TokenStream>>();
+
   let public_version = quote! {
       pub struct #name {
           #(#builder_fields,)*
       }
   };
+
+  println!("{}", public_version);
 
   public_version.into()
 }

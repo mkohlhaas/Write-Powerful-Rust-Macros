@@ -7,8 +7,11 @@ fn main() {
     first: "".to_string(),
     second: 0,
   };
-  let e = Example::new();
-  println!("{}", e.first);
-  println!("{}", e.second);
-  // println!("{}", e.third); // won't work
+
+  let ex = Example::new();
+
+  println!("{}", ex.first);
+  println!("{}", ex.second);
+
+  // println!("{}", ex.third); // won't work
 }
