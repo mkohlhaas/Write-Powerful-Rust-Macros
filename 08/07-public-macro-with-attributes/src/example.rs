@@ -2,7 +2,7 @@
 
 use make_public_macro::public;
 
-#[public(exclude(fourth, third))]
+#[public(exclude(third, fourth))]
 struct Example {
   first: String,
   pub second: u32,

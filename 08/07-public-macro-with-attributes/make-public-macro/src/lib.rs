@@ -1,5 +1,9 @@
-#![allow(dead_code)]
+#![allow(dead_code, unused_features)]
 #![feature(iter_collect_into)]
+
+// Rust has six types of attributes:
+// https://docs.rs/syn/latest/syn/struct.Attribute.html#syntax
+// https://docs.rs/syn/latest/syn/struct.Attribute.html#method.parse_nested_meta
 
 use proc_macro::TokenStream;
 
@@ -12,6 +16,7 @@ use syn::{DataStruct, DeriveInput, FieldsNamed, Ident, MetaList, Token, parse_ma
 const EXCLUDE_ATTRIBUTE_NAME: &str = "exclude";
 
 // Collect excluded fields into basically a vector.
+// Will use parse_nested_meta(…).
 #[derive(Default)]
 struct AlternativeExcludedFields {
   fields: Vec<String>,
@@ -19,10 +24,13 @@ struct AlternativeExcludedFields {
 
 impl AlternativeExcludedFields {
   fn parse(&mut self, meta: ParseNestedMeta) -> Result<(), syn::Error> {
+    println!("`parse` will be called only once!");
     if meta.path.is_ident(EXCLUDE_ATTRIBUTE_NAME) {
       meta.parse_nested_meta(|meta| {
+        print!("Will be called for each attribute: ");
         let ident = &meta.path.segments.first().unwrap().ident;
-        self.fields.push(ident.to_string()); // collection happens here
+        println!("{}", ident);
+        self.fields.push(ident.to_string());
         Ok(())
       })
     } else {
@@ -34,8 +42,8 @@ impl AlternativeExcludedFields {
     name
       .as_ref()
       .map(|ident| ident.to_string())
-      .map(|a_string| self.fields.contains(&a_string))
-      .unwrap_or_else(|| false)
+      .map(|string| self.fields.contains(&string))
+      .unwrap_or(false)
   }
 }
 
@@ -45,6 +53,8 @@ struct ExcludedFields {
   fields: Vec<String>,
 }
 
+// parsing by hand (without parse_nested_meta(…))
+// NOT USED
 impl ExcludedFields {
   fn parse(input: ParseStream) -> Result<Self, syn::Error> {
     match input.parse::<MetaList>() {
@@ -73,7 +83,7 @@ impl ExcludedFields {
       .as_ref()
       .map(|ident| ident.to_string())
       .map(|a_string| self.fields.contains(&a_string))
-      .unwrap_or_else(|| false)
+      .unwrap_or(false)
   }
 }
 
@@ -81,7 +91,7 @@ impl ExcludedFields {
 pub fn public(attr: TokenStream, item: TokenStream) -> TokenStream {
   let derive_input = parse_macro_input!(item as DeriveInput);
   let mut excluded_fields = AlternativeExcludedFields::default();
-  let attr_parser = syn::meta::parser(|meta| excluded_fields.parse(meta));
+  let attr_parser = syn::meta::parser(|meta: ParseNestedMeta<'_>| excluded_fields.parse(meta));
   parse_macro_input!(attr with attr_parser);
 
   let name = derive_input.ident;
@@ -102,8 +112,12 @@ pub fn public(attr: TokenStream, item: TokenStream) -> TokenStream {
     }
   });
 
-  // TODO:
-  // builder_fields.into::<Vec<TokenStream>>();
+  // Debug Code:
+  // let builder_fields_clone = builder_fields.clone();
+  // let bf = quote! {
+  //           #(#builder_fields_clone,)*
+  // };
+  // println!("Builder Fields: {}", bf);
 
   let public_version = quote! {
       pub struct #name {
