@@ -7,8 +7,8 @@ use syn::DeriveInput;
 fn generate_fields(yaml_values: &HashMap<String, String>) -> Vec<TokenStream> {
   yaml_values
     .iter()
-    .map(|v| {
-      let key = Ident::new(v.0, Span::call_site());
+    .map(|kv| {
+      let key = Ident::new(kv.0, Span::call_site());
       quote! {
           pub #key: String
       }
@@ -19,9 +19,9 @@ fn generate_fields(yaml_values: &HashMap<String, String>) -> Vec<TokenStream> {
 fn generate_inits(yaml_values: &HashMap<String, String>) -> Vec<TokenStream> {
   yaml_values
     .iter()
-    .map(|v| {
-      let key = Ident::new(v.0, Span::call_site());
-      let value = v.1;
+    .map(|kv| {
+      let key = Ident::new(kv.0, Span::call_site());
+      let value = kv.1;
       quote! {
           #key: #value.to_string()
       }
@@ -29,11 +29,12 @@ fn generate_inits(yaml_values: &HashMap<String, String>) -> Vec<TokenStream> {
     .collect()
 }
 
+#[cfg(feature = "from")]
 fn generate_inserts_for_from(yaml_values: &HashMap<String, String>) -> Vec<TokenStream> {
   yaml_values
     .iter()
-    .map(|v| {
-      let key = v.0;
+    .map(|kv| {
+      let key = kv.0;
       let key_as_ident = Ident::new(key, Span::call_site());
       quote!(map.insert(#key.to_string(), value.#key_as_ident);)
     })

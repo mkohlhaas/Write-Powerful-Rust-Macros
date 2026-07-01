@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 use syn::parse::{Parse, ParseStream};
 use syn::{LitStr, Token};
 
@@ -12,7 +14,7 @@ pub struct ConfigInput {
   pub exclude_from: bool,
 }
 
-// (only allows either path or exclude)
+// NOTE: only allows either path or exclude
 impl Parse for ConfigInput {
   fn parse(input: ParseStream) -> syn::Result<Self> {
     if input.is_empty() {
