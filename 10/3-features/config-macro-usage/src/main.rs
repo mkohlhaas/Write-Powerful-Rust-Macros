@@ -10,8 +10,11 @@ struct ConfigStruct {}
 fn main() {
   let config = ConfigStruct::new();
   println!("{config:#?}");
-  // let user_admin_map = HashMap::from(config);
-  let user_admin_map: HashMap<_, _> = config.into();
+
+  let user_admin_map = HashMap::from(config);
+  // the same:
+  // let user_admin_map: HashMap<_, _> = config.into();
+
   println!("{:#?}", user_admin_map);
 }
 

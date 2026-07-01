@@ -4,20 +4,24 @@ use proc_macro::TokenStream;
 use proc_macro2::Span;
 use std::collections::HashMap;
 use std::fs;
-#[cfg(feature = "struct")]
-use syn::DeriveInput;
 use syn::parse_macro_input;
 
 mod input;
 mod output;
+
+#[cfg(feature = "struct")]
+use syn::DeriveInput;
+
 #[cfg(feature = "struct")]
 mod struct_output;
+
+const CONFIG_FILE: &str = "./configuration/config.yaml";
 
 fn find_yaml_values(input: &ConfigInput) -> Result<HashMap<String, String>, syn::Error> {
   let file_name = if let Some(path) = &input.path {
     path.to_string()
   } else {
-    "./configuration/config.yaml".to_string()
+    CONFIG_FILE.to_string()
   };
 
   let file = fs::File::open(&file_name).map_err(|_| {
