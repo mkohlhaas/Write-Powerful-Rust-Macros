@@ -1,12 +1,10 @@
+use crate::input::ConfigInput;
+use crate::output::generate_config_struct;
 use proc_macro::TokenStream;
 use proc_macro2::Span;
 use std::collections::HashMap;
 use std::fs;
-
 use syn::parse_macro_input;
-
-use crate::input::ConfigInput;
-use crate::output::generate_config_struct;
 
 mod input;
 mod output;
@@ -19,10 +17,11 @@ fn find_yaml_values(input: ConfigInput) -> Result<HashMap<String, String>, syn::
   let file = fs::File::open(&file_name).map_err(|err| {
     syn::Error::new(
       Span::call_site(),
-      format!("could not read config with path {}: {}", &file_name, err),
+      format!("could not read config with path {}: {}", file_name, err),
     )
   })?;
-  serde_yaml::from_reader(file).map_err(|e| syn::Error::new(Span::call_site(), e.to_string()))
+
+  serde_yaml::from_reader(file).map_err(|err| syn::Error::new(Span::call_site(), err.to_string()))
 }
 
 #[proc_macro]

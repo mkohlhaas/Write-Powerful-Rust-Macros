@@ -5,7 +5,8 @@ fn main() {
 
   let cfg = Config::new();
   let user = cfg.0.get("user").unwrap();
-  println!("{user}");
+  let pw = cfg.0.get("password").unwrap();
+  println!("{user}: {pw}");
 }
 
 #[cfg(test)]
@@ -18,8 +19,10 @@ mod tests {
 
     let cfg = Config::new();
     let user = cfg.0.get("user").unwrap();
+    let pw = cfg.0.get("password").unwrap();
 
     assert_eq!(user, "admin");
+    assert_eq!(pw, "secret");
   }
 
   #[test]

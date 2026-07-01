@@ -5,9 +5,9 @@ use syn::__private::TokenStream2;
 fn generate_inserts(yaml_values: HashMap<String, String>) -> Vec<TokenStream2> {
   yaml_values
     .iter()
-    .map(|v| {
-      let key = v.0;
-      let value = v.1;
+    .map(|kv| {
+      let key = kv.0;
+      let value = kv.1;
       quote!(map.insert(#key.to_string(), #value.to_string());)
     })
     .collect()
