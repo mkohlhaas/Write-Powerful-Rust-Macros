@@ -9,7 +9,7 @@ use syn::Data::Struct;
 use syn::DataStruct;
 use syn::Fields::Named;
 use syn::FieldsNamed;
-use syn::{parse2, DeriveInput};
+use syn::{DeriveInput, parse2};
 
 pub fn create_builder(item: TokenStream) -> TokenStream {
   let derive_input: DeriveInput = parse2(item).unwrap();

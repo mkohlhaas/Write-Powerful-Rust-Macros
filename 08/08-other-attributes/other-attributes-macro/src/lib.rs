@@ -42,5 +42,7 @@ impl Parse for StructWithComments {
 pub fn analyze(item: TokenStream) -> TokenStream {
   let struct_with_comments: StructWithComments = parse_macro_input!(item);
   eprintln!("{:#?}", struct_with_comments);
+
+  // dummy stuff
   quote!().into()
 }

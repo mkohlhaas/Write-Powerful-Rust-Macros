@@ -12,6 +12,8 @@ pub fn optional_default_asserts(fields: &Punctuated<Field, Comma>) -> Vec<TokenS
     .map(|f| {
       let name = &f.ident.as_ref().unwrap().to_string();
       let mut c = name.chars();
+
+      // NOTE: solution for exercise
       let uppercased_name = c.next().unwrap().to_uppercase().collect::<String>() + c.as_str();
 
       let ty = &f.ty;
@@ -116,7 +118,7 @@ pub fn builder_field_definitions(
   })
 }
 
-fn get_name_and_type<'a>(f: &'a Field) -> (&'a Option<Ident>, &'a Type) {
+fn get_name_and_type(f: &Field) -> (&Option<Ident>, &Type) {
   let field_name = &f.ident;
   let field_type = &f.ty;
   (field_name, field_type)

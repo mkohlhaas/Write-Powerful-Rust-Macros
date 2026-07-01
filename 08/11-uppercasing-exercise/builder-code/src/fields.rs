@@ -113,7 +113,7 @@ pub fn builder_field_definitions(
   })
 }
 
-fn get_name_and_type<'a>(f: &'a Field) -> (&'a Option<Ident>, &'a Type) {
+fn get_name_and_type(f: &Field) -> (&Option<Ident>, &Type) {
   let field_name = &f.ident;
   let field_type = &f.ty;
   (field_name, field_type)
@@ -124,7 +124,7 @@ fn extract_attribute_from_field<'a>(f: &'a Field, name: &'a str) -> Option<&'a s
 }
 
 fn matches_type(ty: &Type, type_name: &str) -> bool {
-  if let Type::Path(ref p) = ty {
+  if let Type::Path(p) = ty {
     let first_match = p.path.segments[0].ident.to_string();
     return first_match == *type_name;
   }

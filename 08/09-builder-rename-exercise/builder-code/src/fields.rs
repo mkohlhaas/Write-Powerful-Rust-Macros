@@ -1,6 +1,6 @@
 use quote::quote;
 use syn::__private::TokenStream2;
-use syn::{token::Comma, Field, Ident, LitStr, Token, Type};
+use syn::{Field, Ident, LitStr, Token, Type, token::Comma};
 
 type PFields = syn::punctuated::Punctuated<Field, Comma>;
 
@@ -13,6 +13,7 @@ pub fn builder_methods(fields: &PFields) -> Vec<TokenStream2> {
         let mut content = None;
 
         // eprintln!("{:#?}", attr);
+        // NOTE: this is the code for our renaming syntax
         attr
           .parse_nested_meta(|meta| {
             if meta.path.is_ident("rename") {

@@ -89,6 +89,8 @@ impl ExcludedFields {
 
 #[proc_macro_attribute]
 pub fn public(attr: TokenStream, item: TokenStream) -> TokenStream {
+  println!("Attributes: {:?}", attr);
+  // println!("Item: {:?}", item);
   let derive_input = parse_macro_input!(item as DeriveInput);
   let mut excluded_fields = AlternativeExcludedFields::default();
   let attr_parser = syn::meta::parser(|meta: ParseNestedMeta<'_>| excluded_fields.parse(meta));

@@ -1,11 +1,11 @@
 use other_attributes_macro::analyze;
 
 analyze!(
-    /// outer comment
     /** comment block */
+    /// outer comment
     struct Example {
-        //! inner comment
         /*! inner comment block */
+        //! inner comment
         val: String
     }
 );
