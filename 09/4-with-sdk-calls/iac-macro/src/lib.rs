@@ -3,15 +3,15 @@ mod input;
 mod lambda;
 mod s3;
 
-use proc_macro::TokenStream;
-use quote::quote;
-use syn::parse_macro_input;
-
 use crate::errors::IacError;
 use crate::lambda::LambdaClient;
 use crate::s3::S3Client;
 use input::IacInput;
+use proc_macro::TokenStream;
+use quote::quote;
+use syn::parse_macro_input;
 
+// NOTE: this function starts it all
 async fn create_infra(iac_input: IacInput) -> Result<(), IacError> {
   let s3_client = S3Client::new().await;
   let lambda_client = LambdaClient::new().await;

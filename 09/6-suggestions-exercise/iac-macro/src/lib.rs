@@ -122,6 +122,7 @@ impl Parse for IacInput {
         match input.parse::<Ident>() {
           Ok(remainder) => {
             let remainder_as_string = remainder.to_string();
+            // NOTE: using Levenshtein distance (solution to this exercise)
             let distance_to_bucket = edit_distance("bucket", &remainder_as_string);
             let distance_to_lambda = edit_distance("lambda", &remainder_as_string);
 
@@ -173,5 +174,6 @@ impl Parse for IacInput {
 pub fn iac(item: TokenStream) -> TokenStream {
   let ii: IacInput = parse_macro_input!(item);
   eprintln!("{:?}", ii);
+
   quote!().into()
 }

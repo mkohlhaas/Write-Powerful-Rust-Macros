@@ -54,7 +54,7 @@ impl Parse for Lambda {
       .expect("we just checked for this token");
     let lambda_name = input
       .parse()
-      .map(|v: Ident| v.to_string())
+      .map(|name: Ident| name.to_string())
       .map_err(|_| syn::Error::new(lambda_token.span, "lambda needs a name"))?;
     let mut lambda_memory = None;
     let mut lambda_timeout = None;

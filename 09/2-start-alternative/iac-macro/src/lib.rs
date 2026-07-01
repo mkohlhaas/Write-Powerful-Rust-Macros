@@ -26,7 +26,7 @@ impl Parse for Bucket {
       .expect("we just checked for this token");
     let bucket_name = input
       .parse()
-      .map(|v: Ident| v.to_string())
+      .map(|name: Ident| name.to_string())
       .map_err(|_| syn::Error::new(bucket_token.span(), "bucket needs a name"))?;
 
     let event_needed = if !input.peek(kw::lambda) && input.peek(Token!(=>)) {
@@ -92,7 +92,7 @@ impl Parse for KeyValue {
   fn parse(input: ParseStream) -> Result<Self, syn::Error> {
     let key = input
       .parse()
-      .map(|v: Ident| v.to_string())
+      .map(|name: Ident| name.to_string())
       .map_err(|_| syn::Error::new(input.span(), "should have property keys within parentheses"))?;
     let _: Token!(=) = input.parse().map_err(|_| {
       syn::Error::new(
@@ -104,7 +104,7 @@ impl Parse for KeyValue {
     let value = if key == "name" {
       input
         .parse()
-        .map(|v: Ident| v.to_string())
+        .map(|name: Ident| name.to_string())
         .map_err(|_| syn::Error::new(input.span(), "name property needs a value"))
     } else if key == "mem" || key == "time" {
       input
@@ -145,7 +145,7 @@ impl Parse for IacInput {
           "only 'bucket' and 'lambda' resources are supported",
         ));
       } else {
-        break; // no input left - stop
+        break; // no input left; stop
       }
     }
 
@@ -164,5 +164,6 @@ impl Parse for IacInput {
 pub fn iac(item: TokenStream) -> TokenStream {
   let ii: IacInput = parse_macro_input!(item);
   eprintln!("{:?}", ii);
+
   quote!().into()
 }

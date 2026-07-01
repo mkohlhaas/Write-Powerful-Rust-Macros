@@ -1,12 +1,11 @@
 use proc_macro::TokenStream;
-
 use proc_macro2::Span;
 use quote::quote;
 use syn::parse::{Parse, ParseStream};
 use syn::parse_macro_input;
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
-use syn::{parenthesized, Ident, LitInt, Token};
+use syn::{Ident, LitInt, Token, parenthesized};
 
 pub(crate) mod kw {
   syn::custom_keyword!(bucket);
@@ -30,7 +29,7 @@ impl Parse for Bucket {
       .expect("we just checked for this token");
     let bucket_name = input
       .parse()
-      .map(|v: Ident| v.to_string())
+      .map(|name: Ident| name.to_string())
       .map_err(|_| syn::Error::new(bucket_token.span(), "bucket needs a name"))?;
 
     let event_needed = if !input.peek(kw::lambda) && input.peek(Token!(=>)) {
@@ -56,6 +55,8 @@ enum LambdaProperty {
 
 impl Parse for LambdaProperty {
   fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+    use LambdaProperty::*;
+
     let lookahead = input.lookahead1();
 
     if lookahead.peek(kw::name) {
@@ -70,15 +71,15 @@ impl Parse for LambdaProperty {
       })?;
       let value = input
         .parse()
-        .map(|v: Ident| v.to_string())
+        .map(|name: Ident| name.to_string())
         .map_err(|_| syn::Error::new(input.span(), "name property needs a value"))?;
-      Ok(LambdaProperty::Name(value))
+      Ok(Name(value))
     } else if lookahead.peek(kw::mem) {
       let value = parse_number::<kw::mem>(input, "memory needs a positive value <= 10240")?;
-      Ok(LambdaProperty::Memory(value))
+      Ok(Memory(value))
     } else if lookahead.peek(kw::time) {
       let value = parse_number::<kw::time>(input, "time needs a positive value <= 900")?;
-      Ok(LambdaProperty::Time(value))
+      Ok(Time(value))
     } else {
       Err(syn::Error::new(
         input.span(),
@@ -116,6 +117,42 @@ struct Lambda {
   pub time: Option<u16>,
 }
 
+impl Lambda {
+  fn builder(input_span: Span) -> LambdaBuilder {
+    LambdaBuilder {
+      input_span,
+      name: None,
+      memory: None,
+      time: None,
+    }
+  }
+}
+
+impl Parse for Lambda {
+  fn parse(input: ParseStream) -> Result<Self, syn::Error> {
+    use LambdaProperty::*;
+
+    let _ = input
+      .parse::<kw::lambda>()
+      .expect("we just checked for this token");
+
+    let content;
+    parenthesized!(content in input);
+
+    let kvs = Punctuated::<LambdaProperty, Token!(,)>::parse_terminated(&content)?;
+    let builder = kvs.into_iter().fold(
+      Lambda::builder(content.span()),
+      |lambda_builder, lambda_property| match lambda_property {
+        Name(val) => lambda_builder.name(val),
+        Memory(val) => lambda_builder.memory(val),
+        Time(val) => lambda_builder.time(val),
+      },
+    );
+
+    builder.build()
+  }
+}
+
 struct LambdaBuilder {
   input_span: Span,
   name: Option<String>,
@@ -149,39 +186,6 @@ impl LambdaBuilder {
       memory: self.memory,
       time: self.time,
     })
-  }
-}
-
-impl Lambda {
-  fn builder(input_span: Span) -> LambdaBuilder {
-    LambdaBuilder {
-      input_span,
-      name: None,
-      memory: None,
-      time: None,
-    }
-  }
-}
-
-impl Parse for Lambda {
-  fn parse(input: ParseStream) -> Result<Self, syn::Error> {
-    let _ = input
-      .parse::<kw::lambda>()
-      .expect("we just checked for this token");
-
-    let content;
-    parenthesized!(content in input);
-
-    let kvs = Punctuated::<LambdaProperty, Token!(,)>::parse_terminated(&content)?;
-    let builder = kvs
-      .into_iter()
-      .fold(Lambda::builder(content.span()), |acc, curr| match curr {
-        LambdaProperty::Name(val) => acc.name(val),
-        LambdaProperty::Memory(val) => acc.memory(val),
-        LambdaProperty::Time(val) => acc.time(val),
-      });
-
-    builder.build()
   }
 }
 
@@ -227,5 +231,6 @@ impl Parse for IacInput {
 pub fn iac(item: TokenStream) -> TokenStream {
   let ii: IacInput = parse_macro_input!(item);
   eprintln!("{:?}", ii);
+
   quote!().into()
 }

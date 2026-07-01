@@ -1,12 +1,12 @@
 use iac_macro::iac;
 
 fn main() {
-  // won't accept '-', not valid for identifiers
   iac! {
       bucket uniquename
   }
 
   iac! {
+      // won't accept '-', not valid for identifiers
       lambda a_name
   }
 

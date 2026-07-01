@@ -1,22 +1,27 @@
 // use iac_macro::iac;
 
 fn main() {
-  //iac! {
+  // iac! {
   //     bucket nameshouldbeunique
-  //}
-  //iac! {
+  // }
+
+  // iac! {
   //     lambda my_name
-  //}
-  //iac! {
+  // }
+
+  // iac! {
   //     lambda my_name mem 1024 time 15
-  //}
-  //iac! {
+  // }
+
+  // iac! {
   //     bucket nameshouldbeunique lambda anothername
-  //}
+  // }
+
   // iac! {
   //     bucket nameshouldbeunique => lambda anothername
   // }
-  //iac! {
+
+  // iac! {
   //    bucket nameshouldbeunique => lambda anothername mem 1024 time 15
-  //}
+  // }
 }

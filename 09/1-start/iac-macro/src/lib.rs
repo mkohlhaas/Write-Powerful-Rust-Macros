@@ -27,11 +27,11 @@ impl Parse for Bucket {
       .expect("we just checked for this token");
     let bucket_name = input
       .parse()
-      .map(|v: Ident| v.to_string())
+      .map(|name: Ident| name.to_string())
       .map_err(|_| syn::Error::new(bucket_token.span(), "bucket needs a name"))?;
 
     let event_needed = if !input.peek(kw::lambda) && input.peek(Token!(=>)) {
-      // by peeking, we know the token is present. and we want to get rid of it
+      // by peeking, we know the token is present; and we want to get rid of it
       let _ = input.parse::<Token!(=>)>().unwrap();
       true
     } else {
@@ -150,5 +150,7 @@ impl Parse for IacInput {
 pub fn iac(item: TokenStream) -> TokenStream {
   let ii: IacInput = parse_macro_input!(item);
   eprintln!("{:?}", ii);
+
+  // dummy TokenStream
   quote!().into()
 }
