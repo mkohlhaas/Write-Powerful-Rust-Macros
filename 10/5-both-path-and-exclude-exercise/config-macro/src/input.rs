@@ -17,6 +17,7 @@ impl Parse for ConfigInput {
     let mut path = None;
     let mut exclude_from = None;
 
+    // NOTE: both `path` and `exclude`
     while !input.is_empty() {
       if input.peek(kw::path) {
         let _: kw::path = input.parse().expect("checked that this exists");
