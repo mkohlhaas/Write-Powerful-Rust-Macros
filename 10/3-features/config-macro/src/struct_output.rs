@@ -69,7 +69,7 @@ pub fn generate_annotation_struct(
     quote!()
   };
 
-  quote! {
+  let ann_struct = quote! {
       #(#attributes)*
       pub struct #name {
           #(#fields,)*
@@ -84,5 +84,7 @@ pub fn generate_annotation_struct(
       }
 
       #from
-  }
+  };
+  eprintln!("Annotation Struct:\n{}", ann_struct);
+  ann_struct
 }

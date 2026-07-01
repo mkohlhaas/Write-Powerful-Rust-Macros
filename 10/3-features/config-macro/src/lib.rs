@@ -4,9 +4,9 @@ use proc_macro::TokenStream;
 use proc_macro2::Span;
 use std::collections::HashMap;
 use std::fs;
-use syn::parse_macro_input;
 #[cfg(feature = "struct")]
 use syn::DeriveInput;
+use syn::parse_macro_input;
 
 mod input;
 mod output;
@@ -23,7 +23,7 @@ fn find_yaml_values(input: &ConfigInput) -> Result<HashMap<String, String>, syn:
   let file = fs::File::open(&file_name).map_err(|_| {
     syn::Error::new(
       Span::call_site(),
-      format!("could not find config with path {}", &file_name),
+      format!("could not find config with path {}", file_name),
     )
   })?;
   serde_yaml::from_reader(file).map_err(|e| syn::Error::new(Span::call_site(), e.to_string()))
